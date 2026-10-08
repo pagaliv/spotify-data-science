@@ -1,0 +1,41 @@
+% ============================================
+% ===== CAPÍTULO 1: PLANTEAMIENTO DEL PROBLEMA =====
+% ============================================
+
+\chapter*{Planteamiento del problema}
+\addcontentsline{toc}{chapter}{1. Planteamiento del problema}
+\label{chap:planteamiento}
+
+\section{Contexto}
+\label{sec:contexto}
+
+Spotify es una de las plataformas de streaming musical con mayor número de usuarios a nivel mundial. A través de su API pública (\emph{Spotify Web API}) permite, previa autenticación del propio usuario, consultar información agregada sobre sus hábitos de escucha: artistas más reproducidos, canciones favoritas, listas de reproducción, etc.
+
+Este proyecto nace con el objetivo de aplicar el ciclo de vida de un proyecto de ciencia de datos --- presentado en la primera sesión de la asignatura --- sobre un conjunto de datos propio y personal: el historial de artistas más escuchados de los autores de este trabajo, enriquecido con información de género musical obtenida de una segunda fuente (Last.fm).
+
+\section{Análisis de negocio}
+\label{sec:analisis-negocio}
+
+Siguiendo el esquema de preguntas planteado en la asignatura para delimitar el objetivo de un proyecto de ciencia de datos (¿cuánto?, ¿qué categoría?, ¿qué grupo?, ¿es esto raro?, ¿qué opción se debe tomar?), este trabajo se sitúa principalmente en torno a las preguntas de \textbf{categorización} y \textbf{agrupamiento}:
+
+\begin{itemize}
+    \item ¿Qué géneros musicales predominan en los gustos de cada usuario?
+    \item ¿Es estable el gusto musical en el tiempo, o varía al comparar el corto plazo (\emph{short\_term}, últimas 4 semanas), el medio plazo (\emph{medium\_term}, últimos 6 meses) y el largo plazo (\emph{long\_term}, varios años)?
+    \item ¿Existen agrupaciones naturales de artistas o géneros que permitan describir el perfil musical de un usuario de forma más compacta que una simple lista?
+    \item ¿Qué diferencias y similitudes existen entre los perfiles musicales de los dos autores del trabajo?
+\end{itemize}
+
+\section{Objetivo del proyecto}
+\label{sec:objetivo}
+
+El objetivo principal es construir, a partir de datos personales obtenidos mediante la API de Spotify, un conjunto de datos estructurado que recoja los artistas más escuchados por cada autor en los tres rangos temporales disponibles, junto con los géneros musicales asociados a cada artista. Sobre ese conjunto de datos se realizará:
+
+\begin{itemize}
+    \item Un análisis exploratorio (distribución de géneros, comparación entre rangos temporales, comparación entre usuarios).
+    \item Una visualización de los resultados mediante los tipos de gráficos estudiados en la asignatura.
+    \item Opcionalmente, una tarea de agrupamiento (\emph{clustering}) de artistas o géneros, en la línea de lo trabajado en la práctica de aprendizaje no supervisado de la asignatura.
+\end{itemize}
+
+\begin{tcolorbox}[colback=yellow!10, colframe=yellow!60!black, title=Estado del proyecto]
+Este es un \textbf{primer borrador} del informe. La fase de obtención de datos (Capítulo~\ref{chap:datos} y~\ref{chap:tratamiento}) está completada y documentada. Las fases de diseño del modelo de datos, análisis, visualización de resultados y conclusiones (Capítulos~\ref{chap:modelo}, \ref{chap:resultados} y~\ref{chap:conclusiones}) se han dejado planteadas a modo de esquema, pendientes de completar con el análisis definitivo sobre los datos ya recogidos.
+\end{tcolorbox}

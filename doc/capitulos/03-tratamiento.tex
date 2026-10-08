@@ -1,0 +1,64 @@
+% ============================================
+% ===== CAPÍTULO 3: TRATAMIENTO DE LOS DATOS =====
+% ============================================
+
+\chapter*{Tratamiento de los datos}
+\addcontentsline{toc}{chapter}{3. Tratamiento de los datos}
+\label{chap:tratamiento}
+
+\section{Herramientas y librerías utilizadas}
+\label{sec:herramientas}
+
+El tratamiento de los datos se ha realizado íntegramente en Python, dentro de un cuaderno Jupyter (\texttt{TrabajoTecnicasDeCienciaDeDatos.ipynb}), utilizando las siguientes librerías:
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{|p{0.22\textwidth}|p{0.6\textwidth}|}
+        \hline
+        \textbf{Librería} & \textbf{Uso en el proyecto} \\
+        \hline
+        \texttt{spotipy} & Cliente Python para la Spotify Web API; gestiona el flujo OAuth y las peticiones a los \emph{endpoints} de artistas más escuchados. \\
+        \hline
+        \texttt{requests} & Peticiones HTTP directas al \emph{endpoint} REST de Last.fm (\texttt{artist.gettoptags}). \\
+        \hline
+        \texttt{pandas} & Construcción del \texttt{DataFrame} con los datos combinados y exportación a CSV. \\
+        \hline
+        \texttt{python-dotenv} & Carga de credenciales desde el fichero local \texttt{.env}, evitando guardarlas en el código fuente. \\
+        \hline
+        \texttt{matplotlib} & Prevista para la fase de visualización (Capítulo~\ref{chap:resultados}); instalada desde el inicio del proyecto. \\
+        \hline
+        \texttt{time} (estándar) & Introduce una pausa (\texttt{time.sleep(0.25)}) entre peticiones a Last.fm para respetar el límite de peticiones de su API. \\
+        \hline
+    \end{tabular}
+    \caption{Librerías empleadas en la fase de obtención y tratamiento de datos.}
+    \label{tab:librerias}
+\end{table}
+
+\section{Formato de los datos}
+\label{sec:formato}
+
+Se ha optado por \textbf{CSV} (valores separados por comas) como formato de intercambio y almacenamiento, codificado en \texttt{utf-8-sig} para preservar correctamente los caracteres no latinos presentes en los datos (nombres de artistas en japonés, coreano, etc.) y mantener compatibilidad con Excel. CSV es un formato de datos estructurado y en texto plano, adecuado para un conjunto de datos de tamaño reducido (decenas de filas) que se procesará posteriormente con \texttt{pandas}, frente a alternativas más orientadas a grandes volúmenes o datos jerárquicos como HDF5 (vista en la Sesión~3 de la asignatura), que no se justifican para este volumen de datos.
+
+\section{Proceso de obtención y combinación}
+\label{sec:proceso}
+
+El proceso implementado sigue los siguientes pasos:
+
+\begin{enumerate}
+    \item \textbf{Autenticación}: se cargan las credenciales desde \texttt{.env} y se inicializa el cliente \texttt{spotipy.Spotify} con el \emph{scope} \texttt{user-top-read}.
+    \item \textbf{Descarga de artistas por rango}: para cada uno de los tres rangos temporales (Tabla~\ref{tab:rangos}), se solicita a la API de Spotify el \emph{top} 50 de artistas más escuchados (\texttt{current\_user\_top\_artists}) y se añade cada uno a una lista de registros con su posición, nombre y enlace de Spotify.
+    \item \textbf{Deduplicación antes de consultar géneros}: dado que un mismo artista puede repetirse en varios rangos, se extrae el conjunto de artistas \emph{únicos} (\texttt{df["artista"].unique()}) antes de consultar Last.fm, para minimizar el número de peticiones a la API externa y respetar sus límites de uso.
+    \item \textbf{Consulta de géneros en Last.fm}: para cada artista único se solicita el \emph{endpoint} \texttt{artist.gettoptags}, que devuelve etiquetas junto con un peso (\emph{count}) entre 0 y 100. Se seleccionan como máximo 4 etiquetas con peso igual o superior a 20, descartando las etiquetas no musicales recogidas en el conjunto \texttt{IGNORAR} (nacionalidades, tipo de voz, etc.).
+    \item \textbf{Combinación}: los géneros obtenidos se incorporan al \texttt{DataFrame} original mediante un \emph{mapeo} artista~$\rightarrow$~géneros (\texttt{df["generos"] = df["artista"].map(cache)}), evitando así repetir la consulta a Last.fm para un mismo artista que aparece en varios rangos.
+    \item \textbf{Exportación}: el resultado final se guarda como \texttt{top\_artistas.csv}, con las columnas \texttt{rango}, \texttt{posicion}, \texttt{artista}, \texttt{generos} y \texttt{spotify\_url} (Tabla~\ref{tab:esquema}).
+\end{enumerate}
+
+\section{Decisiones de diseño}
+\label{sec:decisiones}
+
+\begin{itemize}
+    \item Se ha mantenido una primera versión simplificada del script (sin consulta a Last.fm) junto a la versión final, documentando así la evolución del proceso de obtención de datos: primero se validó el acceso a la API de Spotify y, una vez funcionando, se añadió el enriquecimiento con géneros.
+    \item El límite de \textbf{4 géneros por artista} y el \textbf{umbral mínimo de peso 20} se han fijado de forma manual para equilibrar la riqueza de información (más géneros) con la precisión (evitar etiquetas minoritarias o poco representativas).
+    \item Cada autor ejecuta el proceso de forma independiente sobre su propia cuenta de Spotify, generando un CSV por persona (p. ej. \texttt{top\_artistasJorge.csv}), lo que permitirá posteriormente comparar los perfiles musicales de ambos.
+\end{itemize}

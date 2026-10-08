@@ -1,0 +1,93 @@
+% ============================================
+% ===== CAPÍTULO 2: DATOS RECOGIDOS =====
+% ============================================
+
+\chapter*{Datos recogidos}
+\addcontentsline{toc}{chapter}{2. Datos recogidos}
+\label{chap:datos}
+
+\section{Fuentes de datos}
+\label{sec:fuentes}
+
+Siguiendo la clasificación de fuentes públicas de datos vista en la asignatura, este proyecto utiliza dos fuentes encuadradas en la categoría de \textbf{APIs y datos en tiempo real / redes sociales}:
+
+\begin{itemize}
+    \item \textbf{Spotify Web API}, a través de la librería \texttt{spotipy} para Python. Es la fuente primaria: proporciona, para el usuario autenticado, su lista de artistas más escuchados (\texttt{current\_user\_top\_artists}) en tres rangos temporales.
+    \item \textbf{Last.fm API} (\texttt{artist.gettoptags}), utilizada como fuente secundaria para enriquecer cada artista con sus géneros musicales más representativos, ya que la API de Spotify para usuarios individuales no siempre ofrece esta información con el mismo nivel de detalle que Last.fm.
+\end{itemize}
+
+A diferencia de los portales de datos abiertos gubernamentales o los repositorios de \emph{Machine Learning} vistos en la Sesión~1 (Kaggle, UCI, datos.gob.es, etc.), estas dos fuentes requieren autenticación mediante credenciales de desarrollador (\emph{API keys} / OAuth) y devuelven datos \textbf{personales y dinámicos}: el resultado depende del usuario autenticado y cambia con el tiempo según sus hábitos de escucha.
+
+\section{Acceso a los datos}
+\label{sec:acceso}
+
+\subsection{Autenticación en Spotify}
+
+El acceso a los datos de Spotify requiere registrar una aplicación en el panel de desarrolladores de Spotify para obtener un \texttt{Client ID} y un \texttt{Client Secret}, y autenticar al usuario mediante el flujo OAuth \emph{Authorization Code Flow}, gestionado por \texttt{spotipy.oauth2.SpotifyOAuth}. El \emph{scope} solicitado es \texttt{user-top-read}, que da acceso de solo lectura a los artistas y canciones más escuchados por el usuario.
+
+\subsection{Autenticación en Last.fm}
+
+El acceso a Last.fm se realiza mediante una \texttt{API key} simple, enviada como parámetro en cada petición HTTP al \emph{endpoint} \texttt{artist.gettoptags}.
+
+\subsection{Gestión de credenciales}
+
+Las credenciales (\texttt{SPOTIPY\_CLIENT\_ID}, \texttt{SPOTIPY\_CLIENT\_SECRET}, \texttt{SPOTIPY\_REDIRECT\_URI} y \texttt{LASTFM\_API\_KEY}) se almacenan en un fichero \texttt{.env} local, cargado mediante la librería \texttt{python-dotenv}, y no se incluyen en el repositorio del proyecto por motivos de seguridad.
+
+\section{Datos obtenidos}
+\label{sec:datos-obtenidos}
+
+Para cada uno de los dos autores del trabajo se ha ejecutado el proceso de extracción, obteniendo un listado de hasta 50 artistas por cada uno de los tres rangos temporales que ofrece la API de Spotify:
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{|p{0.25\textwidth}|p{0.35\textwidth}|p{0.3\textwidth}|}
+        \hline
+        \textbf{Rango (API)} & \textbf{Significado} & \textbf{Etiqueta usada} \\
+        \hline
+        \texttt{short\_term} & Últimas 4 semanas & \texttt{ultimas\_4\_semanas} \\
+        \hline
+        \texttt{medium\_term} & Últimos 6 meses & \texttt{ultimos\_6\_meses} \\
+        \hline
+        \texttt{long\_term} & Varios años (histórico acumulado) & \texttt{varios\_anios} \\
+        \hline
+    \end{tabular}
+    \caption{Rangos temporales proporcionados por la API de Spotify para el ranking de artistas más escuchados.}
+    \label{tab:rangos}
+\end{table}
+
+Para cada artista se recogen los siguientes campos:
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{|p{0.22\textwidth}|p{0.5\textwidth}|p{0.18\textwidth}|}
+        \hline
+        \textbf{Campo} & \textbf{Descripción} & \textbf{Fuente} \\
+        \hline
+        \texttt{rango} & Rango temporal al que pertenece la entrada (ver Tabla~\ref{tab:rangos}) & Spotify \\
+        \hline
+        \texttt{posicion} & Posición en el ranking dentro de su rango (1--50) & Spotify \\
+        \hline
+        \texttt{artista} & Nombre del artista & Spotify \\
+        \hline
+        \texttt{generos} & Hasta 4 etiquetas de género, separadas por \texttt{;} & Last.fm \\
+        \hline
+        \texttt{spotify\_url} & Enlace al perfil del artista en Spotify & Spotify \\
+        \hline
+    \end{tabular}
+    \caption{Esquema del conjunto de datos recogido por autor (fichero \texttt{top\_artistas*.csv}).}
+    \label{tab:esquema}
+\end{table}
+
+A modo de ejemplo, un artista puede aparecer repetido en los tres rangos (si lleva tiempo siendo escuchado de forma constante) o solo en uno de ellos (si es un descubrimiento reciente o un gusto puntual del pasado), lo cual es en sí mismo una variable de interés para el análisis de la estabilidad del gusto musical.
+
+\section{Problemas de calidad e integración detectados}
+\label{sec:calidad}
+
+\begin{itemize}
+    \item \textbf{Cobertura incompleta de géneros}: no todos los artistas tienen etiquetas en Last.fm, especialmente bandas sonoras de videojuegos o artistas japoneses minoritarios (p. ej. \texttt{ATLUS GAME MUSIC} o compositores japoneses con pocos oyentes en Last.fm), que aparecen sin género asignado.
+    \item \textbf{Etiquetas de Last.fm ruidosas}: Last.fm permite etiquetas libres de usuario, por lo que junto a géneros reales aparecen etiquetas de nacionalidad (\texttt{spanish}, \texttt{japanese}, \texttt{taiwan}) o metaetiquetas sin valor musical (\texttt{seen live}, \texttt{favorites}, \texttt{my top songs}). Se ha aplicado un filtro manual (\texttt{IGNORAR}) para excluir las etiquetas más comunes de este tipo, aunque no es exhaustivo.
+    \item \textbf{Redundancia entre rangos}: un mismo artista puede aparecer hasta tres veces (una por rango), por lo que el fichero combinado no está en forma de tabla \emph{artista--atributos} única, sino en formato largo (\emph{long format}), con una fila por combinación artista-rango.
+    \item \textbf{Normalización de nombres}: los nombres de artistas provienen directamente de Spotify y se usan tal cual para consultar Last.fm; en caso de alias distintos entre ambas plataformas, la búsqueda de género puede fallar silenciosamente (se guarda cadena vacía).
+\end{itemize}

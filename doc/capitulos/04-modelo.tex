@@ -1,0 +1,85 @@
+% ============================================
+% ===== CAPÍTULO 4: DISEÑO DEL MODELO DE DATOS =====
+% ============================================
+
+\chapter*{Diseño del modelo de datos}
+\addcontentsline{toc}{chapter}{4. Diseño del modelo de datos}
+\label{chap:modelo}
+
+\begin{tcolorbox}[colback=yellow!10, colframe=yellow!60!black, title=Pendiente de completar]
+Esta sección recogerá el diseño final del modelo de datos sobre el que se realizará el análisis, una vez decididas las características concretas a estudiar. A continuación se deja el esquema de trabajo previsto.
+\end{tcolorbox}
+
+\section{Estructura de partida}
+\label{sec:estructura-partida}
+
+El conjunto de datos de partida (Capítulo~\ref{chap:datos}) está en \textbf{formato largo}: una fila por combinación (artista, rango) y usuario. Para el análisis se plantea derivar de él las siguientes vistas:
+
+\begin{itemize}
+    \item \textbf{Tabla artista--género (desagregada)}: una fila por cada género individual de cada artista, separando la columna \texttt{generos} (actualmente una cadena con géneros unidos por \texttt{;}) en varias filas. Necesaria para contar frecuencias de género.
+    \item \textbf{Tabla por usuario y rango}: agregación del número de artistas y de géneros distintos por usuario y por rango temporal, para comparar la diversidad musical de cada autor y su evolución en el tiempo (corto, medio y largo plazo).
+    \item \textbf{Tabla combinada de ambos usuarios}: unión de los CSV de cada autor añadiendo una columna \texttt{usuario}, para poder comparar directamente sus perfiles.
+\end{itemize}
+
+\section{Enriquecimiento con fuentes adicionales}
+\label{sec:enriquecimiento}
+
+Se plantea ampliar el conjunto de datos actual (artista, géneros, posición, rango) con más atributos por artista, de forma que el modelo de datos no se limite al género. Las fuentes candidatas, todas accesibles sin necesidad de renegociar permisos adicionales en Spotify, son:
+
+\begin{itemize}
+    \item \textbf{Last.fm -- \texttt{artist.getInfo}}: número de oyentes (\emph{listeners}) y reproducciones totales (\emph{playcount}) del artista, como \emph{proxy} de su popularidad general.
+    \item \textbf{Last.fm -- \texttt{artist.getSimilar}}: lista de artistas similares a uno dado, cada uno con un \emph{match score} entre 0 y 1. Es la pieza clave para la línea de trabajo de afinidad usuario--artista (\S\ref{sec:recomendacion}).
+    \item \textbf{Deezer API}: alternativa pública y sin autenticación compleja para contrastar popularidad y metadatos básicos del artista.
+    \item \textbf{MusicBrainz}: metadatos canónicos (país de origen, año de actividad, etc.) útil para desambiguar artistas con nombres parecidos entre fuentes.
+\end{itemize}
+
+Nótese que la \emph{Spotify Web API} dejó de ofrecer, desde noviembre de 2024, los \emph{endpoints} de \texttt{audio-features} y \texttt{related-artists} para aplicaciones de desarrollador nuevas, por lo que las características de audio (p. ej. \emph{danceability}, \emph{energy}) y los artistas relacionados de Spotify no están disponibles como fuente para este proyecto; de ahí que se recurra a Last.fm como sustituto para la señal de similitud entre artistas.
+
+\section{Tratamiento de valores nulos}
+\label{sec:nulos}
+
+El conjunto de datos actual ya presenta valores nulos (cadena vacía en \texttt{generos}) para los artistas sin etiquetas en Last.fm, descrito en el Capítulo~\ref{chap:datos}. Al incorporar los nuevos atributos de \S\ref{sec:enriquecimiento} se espera que la proporción de nulos aumente, ya que no todos los artistas --especialmente los menos conocidos o de nicho (bandas sonoras, artistas japoneses/coreanos minoritarios)-- estarán presentes en todas las fuentes. Se plantea:
+
+\begin{itemize}
+    \item Cuantificar el porcentaje de nulos por columna y por fuente, antes de decidir cómo tratarlos.
+    \item Para atributos numéricos (oyentes, \emph{playcount}): valorar imputación por mediana o por grupo (p. ej. por género principal), frente a dejarlos como nulo si el porcentaje de huecos es muy alto.
+    \item Para el atributo de similitud (\texttt{artist.getSimilar}): un artista sin vecinos similares conocidos no se imputa, se trata como información ausente real, ya que no tiene un sustituto razonable.
+    \item Documentar siempre qué artistas quedan sin completar tras el proceso, en lugar de descartarlos silenciosamente.
+\end{itemize}
+
+\section{Características a estudiar}
+\label{sec:caracteristicas}
+
+\begin{itemize}
+    \item Frecuencia de cada género musical, global y por usuario.
+    \item Grado de coincidencia de artistas entre los tres rangos temporales (estabilidad del gusto musical).
+    \item Grado de solapamiento entre los perfiles musicales de los dos usuarios (artistas y géneros en común).
+    \item Posición en el \emph{ranking} como indicador de intensidad de escucha (los primeros puestos de cada rango representan los artistas más escuchados).
+    \item Popularidad del artista (oyentes/\emph{playcount} de Last.fm) frente a su posición en el \emph{ranking} personal, para ver si los autores escuchan más artistas populares o más de nicho.
+\end{itemize}
+
+\section{Líneas de trabajo planteadas}
+\label{sec:lineas-trabajo}
+
+A partir de los datos disponibles y de los enriquecimientos previstos, se plantean tres líneas de análisis complementarias. Todas ellas son ideas de partida y podrán ajustarse conforme avance el proyecto.
+
+\subsection{Compatibilidad musical entre los dos usuarios}
+\label{sec:compatibilidad}
+
+Dado que se dispone de un conjunto de datos equivalente para cada autor (\texttt{top\_artistas.csv} y \texttt{top\_artistasJorge.csv}), se plantea calcular un \textbf{índice de compatibilidad musical} entre ambos, por ejemplo mediante el coeficiente de Jaccard sobre el conjunto de artistas o géneros en común, o mediante la similitud del coseno entre los vectores de frecuencia de género de cada usuario. Este índice podría calcularse también por rango temporal, para ver si la compatibilidad es mayor en el gusto reciente que en el histórico.
+
+\subsection{Afinidad usuario--artista (recomendación por similitud)}
+\label{sec:recomendacion}
+
+Se plantea explorar si, dado un artista nuevo (no presente en el historial de un usuario), se puede estimar si le gustaría, sin necesidad de un clasificador supervisado clásico. La razón es que no existe una fuente fiable de ejemplos \emph{negativos}: la API de Spotify no expone artistas bloqueados u ocultados por el usuario, y tratar como negativo un artista con menos escuchas o presente solo en \texttt{long\_term} sería un sustituto débil y discutible. En su lugar, se propone un enfoque basado en \textbf{similitud de contenido}:
+
+\begin{enumerate}
+    \item A partir de \texttt{artist.getSimilar} (Last.fm), obtener los artistas más cercanos al artista candidato.
+    \item Calcular qué proporción de esos artistas similares ya están presentes en el historial del usuario (y con qué peso, según su posición en el \emph{ranking}).
+    \item Usar ese solapamiento como medida de afinidad estimada, en lugar de una predicción binaria estricta de ``le gusta / no le gusta''.
+\end{enumerate}
+
+\subsection{Agrupamiento (\emph{clustering})}
+\label{sec:clustering-previsto}
+
+En línea con lo trabajado en la práctica de aprendizaje no supervisado de la asignatura, se plantea explorar una codificación de cada artista mediante sus géneros (variables \emph{dummy} uno por género) para aplicar un algoritmo de \emph{clustering} (p. ej. K-Means) que agrupe artistas o usuarios por afinidad de género, de forma análoga al análisis de clientes realizado en la Práctica~3 de Aprendizaje Automático.

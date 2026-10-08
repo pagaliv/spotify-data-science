@@ -1,0 +1,56 @@
+% ============================================
+% ===== CAPÍTULO 5: RESULTADOS Y VISUALIZACIÓN =====
+% ============================================
+
+\chapter*{Resultados y visualización}
+\addcontentsline{toc}{chapter}{5. Resultados y visualización}
+\label{chap:resultados}
+
+\begin{tcolorbox}[colback=yellow!10, colframe=yellow!60!black, title=Pendiente de completar]
+Este capítulo recogerá las visualizaciones y los resultados numéricos obtenidos al ejecutar el análisis sobre el modelo de datos descrito en el Capítulo~\ref{chap:modelo}. Se deja planteado el plan de visualizaciones, siguiendo los criterios de audiencia, objetivo y tipo de gráfico vistos en la Sesión~6 de la asignatura (Visualización de datos).
+\end{tcolorbox}
+
+\section{Plan de visualizaciones}
+\label{sec:plan-visualizaciones}
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.6}
+    \begin{tabular}{|p{0.3\textwidth}|p{0.3\textwidth}|p{0.3\textwidth}|}
+        \hline
+        \textbf{Pregunta} & \textbf{Gráfico previsto} & \textbf{Referencia} \\
+        \hline
+        ¿Qué géneros predominan por usuario? & Gráfico de barras horizontales (\emph{top} N géneros por frecuencia) & \S\ref{sec:caracteristicas} \\
+        \hline
+        ¿Cómo se reparten los géneros en conjunto? & Gráfico circular o de barras apiladas, comparando ambos usuarios & \S\ref{sec:caracteristicas} \\
+        \hline
+        ¿Cambia el gusto musical según el rango temporal? & Gráfico de barras agrupado por rango (\texttt{countplot} por rango y género) & Tabla~\ref{tab:rangos} \\
+        \hline
+        ¿Cuántos artistas se repiten entre rangos? & Diagrama de Venn o tabla cruzada de coincidencias & \S\ref{sec:caracteristicas} \\
+        \hline
+        ¿Qué tan compatibles son los dos usuarios? & Gráfico de barras o mapa de calor con el índice de compatibilidad por rango & \S\ref{sec:compatibilidad} \\
+        \hline
+        ¿Artistas populares o de nicho? & \emph{Scatter plot} de posición en el \emph{ranking} frente a popularidad (Last.fm) & \S\ref{sec:enriquecimiento} \\
+        \hline
+        Afinidad estimada con un artista nuevo & Gráfico de barras con el grado de solapamiento con artistas similares & \S\ref{sec:recomendacion} \\
+        \hline
+        Agrupamiento de artistas/usuarios por género (opcional) & \emph{Scatter plot} del resultado del \emph{clustering}, con baricentros & \S\ref{sec:clustering-previsto} \\
+        \hline
+    \end{tabular}
+    \caption{Plan de visualizaciones previsto para el análisis de resultados.}
+    \label{tab:plan-visualizaciones}
+\end{table}
+
+\section{Figuras y tablas de resultados}
+\label{sec:figuras-resultados}
+
+% Al completar el análisis, insertar aquí las figuras generadas con matplotlib/seaborn, por ejemplo:
+%
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\textwidth,keepaspectratio]{./img/top_generos.png}
+%     \caption{Descripción de la figura.}
+%     \label{fig:top-generos}
+% \end{figure}
+
+\textit{(Pendiente de incorporar las figuras generadas a partir del análisis sobre \texttt{top\_artistas.csv} y \texttt{top\_artistasJorge.csv}.)}

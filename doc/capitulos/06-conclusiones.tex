@@ -1,0 +1,36 @@
+% ============================================
+% ===== CAPÍTULO 6: CONCLUSIONES =====
+% ============================================
+
+\chapter*{Conclusiones}
+\addcontentsline{toc}{chapter}{6. Conclusiones}
+\label{chap:conclusiones}
+
+\begin{tcolorbox}[colback=yellow!10, colframe=yellow!60!black, title=Pendiente de completar]
+Las conclusiones definitivas se redactarán una vez completado el análisis y la visualización de resultados (Capítulos~\ref{chap:modelo} y~\ref{chap:resultados}). A continuación se dejan algunas conclusiones preliminares, centradas en el propio proceso de obtención de datos.
+\end{tcolorbox}
+
+\section{Conclusiones sobre el proceso de obtención de datos}
+\label{sec:conclusiones-datos}
+
+\begin{itemize}
+    \item Combinar dos APIs externas (Spotify y Last.fm) permite enriquecer un conjunto de datos personal con información que ninguna de las dos fuentes ofrece de forma completa por sí sola, a costa de introducir ruido y huecos (artistas sin género) propios de combinar fuentes de distinta calidad y cobertura.
+    \item El uso de una caché en memoria por artista único, en lugar de consultar Last.fm una vez por cada fila del conjunto de datos, resultó clave para mantener el proceso dentro de los límites de peticiones de la API externa.
+    \item Trabajar con datos personales y dinámicos (dependientes del usuario autenticado y del momento de la consulta) implica que los resultados de este proyecto no son directamente reproducibles por un tercero sin sus propias credenciales y su propio historial de escucha, a diferencia de un conjunto de datos abierto y estático.
+\end{itemize}
+
+\section{Conclusiones del análisis}
+\label{sec:conclusiones-analisis}
+
+\textit{(Pendiente de redactar tras completar los Capítulos~\ref{chap:modelo} y~\ref{chap:resultados}: diversidad de géneros por usuario, estabilidad del gusto musical entre rangos temporales, grado de afinidad musical entre los dos autores y, en su caso, interpretación de los grupos obtenidos mediante \emph{clustering}.)}
+
+\section{Limitaciones y trabajo futuro}
+\label{sec:limitaciones}
+
+\begin{itemize}
+    \item El filtro de etiquetas no musicales de Last.fm (\texttt{IGNORAR}) es manual y no exhaustivo; podría mejorarse con una lista de géneros de referencia o un modelo de clasificación de etiquetas.
+    \item El análisis se limita a dos usuarios; las conclusiones sobre similitud/diversidad musical no son generalizables más allá de los propios autores.
+    \item La línea de afinidad usuario--artista (\S\ref{sec:recomendacion}) se apoya en similitud de contenido precisamente porque no existe una fuente fiable de ejemplos negativos (Spotify no expone artistas bloqueados/ocultados); un clasificador supervisado real de ``le gusta / no le gusta'' quedaría fuera del alcance de los datos disponibles.
+    \item La \emph{Spotify Web API} ya no ofrece, para aplicaciones nuevas, los \emph{endpoints} de \texttt{audio-features} ni \texttt{related-artists} (restringidos desde noviembre de 2024), lo que limita el enriquecimiento a lo que puedan aportar fuentes externas como Last.fm, Deezer o MusicBrainz (\S\ref{sec:enriquecimiento}).
+    \item Como ampliación, podría incorporarse también el historial de canciones más escuchadas (no solo artistas) además de los atributos de popularidad y similitud ya planteados.
+\end{itemize}

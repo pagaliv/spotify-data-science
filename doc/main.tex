@@ -1,0 +1,85 @@
+\documentclass[12pt,openany]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish, es-noshorthands]{babel}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{colortbl}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{tcolorbox}                       % Cajas con color
+\usepackage{forest}
+\usepackage{pifont}      % para \ding{51} (checkmark) y \ding{55} (cross)
+\usepackage{verbatim}
+% Definir un estilo de árbol para el EDT
+\forestset{
+  edt/.style={
+    for tree={
+      draw,                % borde alrededor de cada nodo
+      rounded corners,
+      align=center,
+      text width=2.8cm,
+      font=\small,
+      parent anchor=south,
+      child anchor=north,
+      edge={->, thick},    % flecha de conexión
+      l sep=1cm,           % separación vertical entre niveles
+      s sep=1cm,           % separación horizontal entre nodos hermanos
+      tier/.option=level   % alinea nodos del mismo nivel
+    }
+  }
+}
+\geometry{a4paper, margin=2.5cm}
+
+
+
+% Configuración de títulos de capítulo
+% Mostrar "Capítulo N: Título" en el encabezado del capítulo
+\titleformat{\chapter}[hang]{\huge\bfseries}{Capítulo \ \thechapter:}{1em}{}
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+
+% Configuración de títulos de sección
+\titleformat{\section}{\Large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\large\bfseries}{}{0em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\itshape}{}{0em}{}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+}
+
+
+
+\begin{document}
+\raggedbottom
+% ==== PORTADA ====
+\input{./preliminares/portada}
+
+
+% ===== ÍNDICES =====
+
+\tableofcontents    % Índice general
+
+
+\newpage
+
+% ===== CAPÍTULOS PRINCIPALES =====
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\input{./capitulos/01-planteamiento}
+\input{./capitulos/02-datos}
+\input{./capitulos/03-tratamiento}
+\input{./capitulos/04-modelo}
+\input{./capitulos/05-resultados}
+\input{./capitulos/06-conclusiones}
+
+
+
+\end{document}

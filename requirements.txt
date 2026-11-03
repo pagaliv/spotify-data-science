@@ -1,0 +1,10 @@
+numpy>=2.0,<3
+pandas>=2.2,<4
+matplotlib>=3.8,<4
+seaborn>=0.13,<1
+scipy>=1.11,<2
+scikit-learn>=1.5,<2
+requests>=2.31,<3
+python-dotenv>=1.0,<2
+spotipy>=2.24,<3
+jupyterlab>=4.0,<5

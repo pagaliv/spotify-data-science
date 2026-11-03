@@ -1,0 +1,14 @@
+{
+  "pablo": {
+    "fecha": "2026-11-03",
+    "filas": 150,
+    "rangos": [
+      "ultimas_4_semanas",
+      "ultimos_6_meses",
+      "varios_anios"
+    ],
+    "artistas_unicos": 74,
+    "filas_con_generos": 146
+  },
+  "jorge": null
+}

@@ -1,0 +1,29 @@
+# Entorno
+venv/
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+
+# Secretos y datos personales
+.env
+.cache
+.cache-*
+top_artistas*.csv
+cache/
+
+# Salidas derivadas con nombres de artistas
+resultados/artistas_*.csv
+resultados/afinidad_*.csv
+resultados/clusters_artistas.csv
+
+# LaTeX auxiliar
+*.aux
+*.log
+*.out
+*.toc
+*.nav
+*.snm
+*.vrb
+*.fls
+*.fdb_latexmk
+.DS_Store

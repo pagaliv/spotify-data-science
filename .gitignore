@@ -5,9 +5,11 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Secretos y datos personales
-.env
+.env*
+!.env.example
 .cache
 .cache-*
+*.cache
 top_artistas*.csv
 cache/
 

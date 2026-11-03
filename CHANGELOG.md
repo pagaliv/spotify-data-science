@@ -11,6 +11,8 @@ Se consolida el proyecto como un entorno reproducible (venv, `requirements.txt`,
 - `v0.4.0.5`: `add(analisis)`: cuaderno `AnalisisTecnicasDeCienciaDeDatos.ipynb` con las diez secciones del análisis y exportación de métricas.
 - `v0.4.0.6`: `doc`: capítulos 1-4 reescritos con el alcance final (Last.fm/Deezer, MusicBrainz descartada, modelo de datos, nulos y métodos).
 - `v0.4.0.7`: `fix(analisis)`: carga explícita de `.env` en el cuaderno de análisis para que el enriquecimiento disponga de `LASTFM_API_KEY`.
+- `v0.4.0.8`: `fix(env)`: el patrón `.env` no cubría un fichero `.env ` con espacio final que llegó a versionarse; se sustituye por `.env*` con excepción `!.env.example` y se retira del índice el fichero afectado (las credenciales que contenía quedaron revocadas y rotadas). Se añade `*.cache` como red de seguridad para otras cachés de tokens de Spotipy.
+- `v0.4.0.9`: `data`: regeneración de la extracción de Pablo con la aplicación de Spotify rotada (150 filas, 3 rangos × 50, 74 artistas únicos, 146 filas con géneros); 149 de 150 pares (rango, artista) coinciden con la extracción previa, la diferencia es un artista del rango de 4 semanas.
 
 ## v0.3 - Primer borrador del informe (LaTeX)
 Se añade un primer borrador del informe del proyecto en `doc/`, siguiendo la plantilla LaTeX usada en las prácticas del máster (`main.tex` + `preliminares/portada.tex` + `capitulos/`). El informe cubre en detalle el planteamiento del problema, las fuentes de datos (Spotify Web API + Last.fm) y el proceso de obtención y tratamiento ya implementado en el notebook; el diseño del modelo de datos, los resultados/visualización y las conclusiones quedan como esquema de trabajo pendiente de completar con el análisis definitivo.

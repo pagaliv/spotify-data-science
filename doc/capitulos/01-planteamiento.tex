@@ -11,31 +11,36 @@
 
 Spotify es una de las plataformas de streaming musical con mayor número de usuarios a nivel mundial. A través de su API pública (\emph{Spotify Web API}) permite, previa autenticación del propio usuario, consultar información agregada sobre sus hábitos de escucha: artistas más reproducidos, canciones favoritas, listas de reproducción, etc.
 
-Este proyecto nace con el objetivo de aplicar el ciclo de vida de un proyecto de ciencia de datos --- presentado en la primera sesión de la asignatura --- sobre un conjunto de datos propio y personal: el historial de artistas más escuchados de los autores de este trabajo, enriquecido con información de género musical obtenida de una segunda fuente (Last.fm).
+Este proyecto nace con el objetivo de aplicar el ciclo de vida de un proyecto de ciencia de datos ---presentado en la primera sesión de la asignatura--- sobre un conjunto de datos propio y personal: el historial de artistas más escuchados de los autores de este trabajo, enriquecido con información de género y de similitud obtenida de Last.fm y con una segunda medida de popularidad procedente de Deezer.
 
 \section{Análisis de negocio}
 \label{sec:analisis-negocio}
 
-Siguiendo el esquema de preguntas planteado en la asignatura para delimitar el objetivo de un proyecto de ciencia de datos (¿cuánto?, ¿qué categoría?, ¿qué grupo?, ¿es esto raro?, ¿qué opción se debe tomar?), este trabajo se sitúa principalmente en torno a las preguntas de \textbf{categorización} y \textbf{agrupamiento}:
+Siguiendo el esquema de preguntas planteado en la asignatura para delimitar el objetivo de un proyecto de ciencia de datos (¿cuánto?, ¿qué categoría?, ¿qué grupo?, ¿es esto raro?, ¿qué opción se debe tomar?), este trabajo se sitúa principalmente en torno a las preguntas de \textbf{categorización}, \textbf{agrupamiento} y \textbf{comparación}:
 
 \begin{itemize}
     \item ¿Qué géneros musicales predominan en los gustos de cada usuario?
     \item ¿Es estable el gusto musical en el tiempo, o varía al comparar el corto plazo (\emph{short\_term}, últimas 4 semanas), el medio plazo (\emph{medium\_term}, últimos 6 meses) y el largo plazo (\emph{long\_term}, varios años)?
-    \item ¿Existen agrupaciones naturales de artistas o géneros que permitan describir el perfil musical de un usuario de forma más compacta que una simple lista?
+    \item ¿Existen agrupaciones naturales de artistas que permitan describir el perfil musical de forma más compacta que una simple lista?
     \item ¿Qué diferencias y similitudes existen entre los perfiles musicales de los dos autores del trabajo?
+    \item ¿Se comportan los autores de forma parecida respecto a la popularidad de los artistas que escuchan?
+    \item ¿Se puede estimar, para un artista ajeno al historial, si encaja con el gusto de un usuario a partir de la similitud con sus artistas favoritos?
 \end{itemize}
 
 \section{Objetivo del proyecto}
 \label{sec:objetivo}
 
-El objetivo principal es construir, a partir de datos personales obtenidos mediante la API de Spotify, un conjunto de datos estructurado que recoja los artistas más escuchados por cada autor en los tres rangos temporales disponibles, junto con los géneros musicales asociados a cada artista. Sobre ese conjunto de datos se realizará:
+El objetivo principal es construir, a partir de datos personales obtenidos mediante la API de Spotify, un conjunto de datos estructurado que recoja los artistas más escuchados por cada autor en los tres rangos temporales disponibles, junto con los géneros musicales asociados a cada artista y otros atributos de popularidad y similitud. Sobre ese conjunto de datos se realiza:
 
 \begin{itemize}
-    \item Un análisis exploratorio (distribución de géneros, comparación entre rangos temporales, comparación entre usuarios).
-    \item Una visualización de los resultados mediante los tipos de gráficos estudiados en la asignatura.
-    \item Opcionalmente, una tarea de agrupamiento (\emph{clustering}) de artistas o géneros, en la línea de lo trabajado en la práctica de aprendizaje no supervisado de la asignatura.
+    \item Un análisis descriptivo de la diversidad y la evolución del gusto musical (distribución de géneros, comparación entre rangos temporales y entre usuarios).
+    \item Un análisis de compatibilidad entre los dos autores mediante métricas de similitud sobre artistas y géneros.
+    \item Un análisis de popularidad, contrastando la posición en el ranking personal con los oyentes de Last.fm y los fans de Deezer.
+    \item Una estimación de afinidad usuario--artista para artistas nuevos, basada en la similitud de contenido de Last.fm.
+    \item Un \emph{clustering} de artistas por sus géneros, en la línea de lo trabajado en la práctica de aprendizaje no supervisado de la asignatura.
+    \item La visualización de los resultados mediante los tipos de gráficos estudiados en la asignatura, justificando en cada caso el tipo elegido.
 \end{itemize}
 
-\begin{tcolorbox}[colback=yellow!10, colframe=yellow!60!black, title=Estado del proyecto]
-Este es un \textbf{primer borrador} del informe. La fase de obtención de datos (Capítulo~\ref{chap:datos} y~\ref{chap:tratamiento}) está completada y documentada. Las fases de diseño del modelo de datos, análisis, visualización de resultados y conclusiones (Capítulos~\ref{chap:modelo}, \ref{chap:resultados} y~\ref{chap:conclusiones}) se han dejado planteadas a modo de esquema, pendientes de completar con el análisis definitivo sobre los datos ya recogidos.
+\begin{tcolorbox}[colback=green!5, colframe=green!45!black, title=Proyecto completado]
+El proyecto se entrega completo: extracción de datos para los dos autores, cuaderno de análisis ejecutado, enriquecimiento con Last.fm y Deezer, tratamiento documentado de valores nulos, análisis de compatibilidad, popularidad, afinidad y agrupamiento, diez figuras para el informe y conclusiones. Las únicas fuentes descartadas se justifican en su capítulo correspondiente (MusicBrainz) o vienen impuestas por la API de Spotify (\emph{audio-features} y \emph{related-artists}).
 \end{tcolorbox}

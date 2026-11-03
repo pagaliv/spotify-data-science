@@ -6,80 +6,183 @@
 \addcontentsline{toc}{chapter}{4. Diseño del modelo de datos}
 \label{chap:modelo}
 
-\begin{tcolorbox}[colback=yellow!10, colframe=yellow!60!black, title=Pendiente de completar]
-Esta sección recogerá el diseño final del modelo de datos sobre el que se realizará el análisis, una vez decididas las características concretas a estudiar. A continuación se deja el esquema de trabajo previsto.
-\end{tcolorbox}
+Este capítulo describe el modelo de datos construido para el análisis y las decisiones de tratamiento que lo acompañan. Todas las transformaciones están implementadas como funciones puras en el módulo \texttt{spotify\_analisis.py}, de modo que el cuaderno \texttt{AnalisisTecnicasDeCienciaDeDatos.ipynb} se limita a orquestarlas y a presentar los resultados. La separación entre lógica y presentación permite reproducir el análisis completo con un único \emph{Restart \& Run All} y reutilizar las mismas funciones con los datos de cualquier otro usuario.
 
-\section{Estructura de partida}
+\section{Estructura de partida y consolidación}
 \label{sec:estructura-partida}
 
-El conjunto de datos de partida (Capítulo~\ref{chap:datos}) está en \textbf{formato largo}: una fila por combinación (artista, rango) y usuario. Para el análisis se plantea derivar de él las siguientes vistas:
+El conjunto de datos de partida (Capítulo~\ref{chap:datos}) está en \textbf{formato largo}: una fila por combinación (usuario, rango, posición). Sobre él se construyen las siguientes vistas:
 
 \begin{itemize}
-    \item \textbf{Tabla artista--género (desagregada)}: una fila por cada género individual de cada artista, separando la columna \texttt{generos} (actualmente una cadena con géneros unidos por \texttt{;}) en varias filas. Necesaria para contar frecuencias de género.
-    \item \textbf{Tabla por usuario y rango}: agregación del número de artistas y de géneros distintos por usuario y por rango temporal, para comparar la diversidad musical de cada autor y su evolución en el tiempo (corto, medio y largo plazo).
-    \item \textbf{Tabla combinada de ambos usuarios}: unión de los CSV de cada autor añadiendo una columna \texttt{usuario}, para poder comparar directamente sus perfiles.
+    \item \textbf{Tabla larga consolidada}: unión de los CSV de ambos autores con las columnas originales más \texttt{usuario} y \texttt{rango\_orden} (1 = últimas 4 semanas, 2 = últimos 6 meses, 3 = varios años). La posición se convierte a entero y la columna \texttt{generos} se normaliza a cadena vacía cuando falta.
+    \item \textbf{Tabla artista--género}: una fila por cada género individual de cada artista, separando la cadena \texttt{generos} por \texttt{;}. Los géneros se normalizan a minúsculas y se deduplican dentro de cada artista, de forma que un artista que aparezca en varios rangos no infla el recuento.
+    \item \textbf{Resumen por usuario y rango}: número de artistas distintos, artistas con al menos un género, porcentaje de cobertura y número de géneros distintos.
+    \item \textbf{Tabla combinada}: permite comparar directamente los perfiles de ambos autores, que es la base de la compatibilidad del \S\ref{sec:compatibilidad}.
 \end{itemize}
+
+La Tabla~\ref{tab:tablas-derivadas} resume el grano y el uso de cada tabla derivada.
+
+\begin{table}[H]
+    \centering
+    \caption{Tablas derivadas del modelo de datos.}
+    \label{tab:tablas-derivadas}
+    \small
+    \begin{tabular}{|p{0.24\textwidth}|p{0.30\textwidth}|p{0.36\textwidth}|}
+        \hline
+        \textbf{Tabla} & \textbf{Grano} & \textbf{Uso principal} \\
+        \hline
+        \texttt{datos\_largo} & usuario $\times$ rango $\times$ posición & Base del análisis descriptivo y de la estabilidad \\
+        \hline
+        \texttt{artista\_genero} & artista $\times$ género & Frecuencias de género y matriz binaria para el agrupamiento \\
+        \hline
+        \texttt{perfil\_usuario\_rango} & usuario $\times$ rango & Cobertura y diversidad por rango \\
+        \hline
+        \texttt{artistas} & artista único & Atributos enriquecidos y banderas de imputación \\
+        \hline
+        \texttt{similitudes} & artista $\times$ similar & Candidatos y puntuación de afinidad \\
+        \hline
+        \texttt{compatibilidad} & rango (incluido global) & Comparación entre autores \\
+        \hline
+        \texttt{afinidad} & candidato $\times$ usuario & Ranking de artistas nuevos por usuario \\
+        \hline
+        \texttt{clusters} & artista & Asignación de cada artista a un grupo \\
+        \hline
+    \end{tabular}
+\end{table}
 
 \section{Enriquecimiento con fuentes adicionales}
 \label{sec:enriquecimiento}
 
-Se plantea ampliar el conjunto de datos actual (artista, géneros, posición, rango) con más atributos por artista, de forma que el modelo de datos no se limite al género. Las fuentes candidatas, todas accesibles sin necesidad de renegociar permisos adicionales en Spotify, son:
+El modelo no se limita a los géneros: cada artista único se enriquece con atributos de popularidad y de similitud procedentes de Last.fm y Deezer. La Tabla~\ref{tab:campos-enriquecidos} recoge los campos incorporados y su finalidad.
 
-\begin{itemize}
-    \item \textbf{Last.fm -- \texttt{artist.getInfo}}: número de oyentes (\emph{listeners}) y reproducciones totales (\emph{playcount}) del artista, como \emph{proxy} de su popularidad general.
-    \item \textbf{Last.fm -- \texttt{artist.getSimilar}}: lista de artistas similares a uno dado, cada uno con un \emph{match score} entre 0 y 1. Es la pieza clave para la línea de trabajo de afinidad usuario--artista (\S\ref{sec:recomendacion}).
-    \item \textbf{Deezer API}: alternativa pública y sin autenticación compleja para contrastar popularidad y metadatos básicos del artista.
-    \item \textbf{MusicBrainz}: metadatos canónicos (país de origen, año de actividad, etc.) útil para desambiguar artistas con nombres parecidos entre fuentes.
-\end{itemize}
+\begin{table}[H]
+    \centering
+    \caption{Campos incorporados en la tabla de artistas.}
+    \label{tab:campos-enriquecidos}
+    \small
+    \begin{tabular}{|p{0.26\textwidth}|p{0.20\textwidth}|p{0.44\textwidth}|}
+        \hline
+        \textbf{Campo} & \textbf{Fuente} & \textbf{Uso} \\
+        \hline
+        \texttt{listeners}, \texttt{playcount}, \texttt{mbid} & Last.fm (\texttt{artist.getInfo}) & Popularidad general del artista \\
+        \hline
+        \texttt{similar\_top}, \texttt{match\_top}, \texttt{n\_similares} & Last.fm (\texttt{artist.getSimilar}) & Vecindad de similitud para la afinidad \\
+        \hline
+        \texttt{deezer\_fans}, \texttt{deezer\_nb\_album} & Deezer (búsqueda pública) & Contraste de popularidad y generación de nulos reales \\
+        \hline
+    \end{tabular}
+\end{table}
 
-Nótese que la \emph{Spotify Web API} dejó de ofrecer, desde noviembre de 2024, los \emph{endpoints} de \texttt{audio-features} y \texttt{related-artists} para aplicaciones de desarrollador nuevas, por lo que las características de audio (p. ej. \emph{danceability}, \emph{energy}) y los artistas relacionados de Spotify no están disponibles como fuente para este proyecto; de ahí que se recurra a Last.fm como sustituto para la señal de similitud entre artistas.
+Las consultas se realizan una sola vez por artista y se guardan en una caché JSON local (\texttt{cache/enriquecimiento.json}), de modo que una segunda ejecución no repite llamadas. Se aplica una pausa entre peticiones y reintentos con espera creciente ante errores temporales o límites de frecuencia. Los artistas no encontrados se registran con valores nulos y la bandera correspondiente, en lugar de reintentarse indefinidamente.
+
+Se evaluó también \textbf{MusicBrainz} como fuente de metadatos canónicos (país, año de actividad, identificadores). Se descartó porque, sin un mapa geográfico en el alcance del proyecto, no aportaba variables que mejorasen las preguntas planteadas y añadía una consulta adicional por artista.
+
+Cabe recordar que la \emph{Spotify Web API} dejó de ofrecer los \emph{endpoints} de \texttt{audio-features} y \texttt{related-artists} para aplicaciones de desarrollador nuevas, por lo que las características de audio y los artistas relacionados de Spotify no están disponibles como fuente; de ahí que Last.fm cubra la señal de similitud entre artistas.
 
 \section{Tratamiento de valores nulos}
 \label{sec:nulos}
 
-El conjunto de datos actual ya presenta valores nulos (cadena vacía en \texttt{generos}) para los artistas sin etiquetas en Last.fm, descrito en el Capítulo~\ref{chap:datos}. Al incorporar los nuevos atributos de \S\ref{sec:enriquecimiento} se espera que la proporción de nulos aumente, ya que no todos los artistas --especialmente los menos conocidos o de nicho (bandas sonoras, artistas japoneses/coreanos minoritarios)-- estarán presentes en todas las fuentes. Se plantea:
+Los nulos aparecen en dos niveles: géneros vacíos en el CSV de extracción y atributos ausentes en las fuentes externas (artistas de nicho, bandas sonoras o proyectos minoritarios que no están dados de alta en todas las plataformas). El tratamiento es deliberadamente distinto según el tipo de variable:
 
 \begin{itemize}
-    \item Cuantificar el porcentaje de nulos por columna y por fuente, antes de decidir cómo tratarlos.
-    \item Para atributos numéricos (oyentes, \emph{playcount}): valorar imputación por mediana o por grupo (p. ej. por género principal), frente a dejarlos como nulo si el porcentaje de huecos es muy alto.
-    \item Para el atributo de similitud (\texttt{artist.getSimilar}): un artista sin vecinos similares conocidos no se imputa, se trata como información ausente real, ya que no tiene un sustituto razonable.
-    \item Documentar siempre qué artistas quedan sin completar tras el proceso, en lugar de descartarlos silenciosamente.
+    \item \textbf{Popularidad} (\texttt{listeners}, \texttt{playcount}, \texttt{deezer\_fans}): se cuantifica el porcentaje de nulos por columna y por fuente y se imputa la mediana del género principal cuando ese grupo tiene al menos cinco artistas con dato; en caso contrario se usa la mediana global. Cada imputación queda marcada con una bandera \texttt{imputado\_*}.
+    \item \textbf{Similitud y género}: no se imputan. Un artista sin vecinos similares o sin etiquetas no tiene un sustituto razonable y tratarlo como si lo tuviera introduciría una señal artificial. Se documenta qué artistas quedan fuera de cada análisis.
+    \item \textbf{Correlaciones de popularidad}: se calculan sobre casos completos, nunca sobre valores imputados, para no inflar artificialmente la correlación.
 \end{itemize}
 
-\section{Características a estudiar}
+La Figura~\ref{fig:nulos} muestra la cobertura resultante y la Tabla~\ref{tab:nulos-reglas} resume las reglas aplicadas.
+
+\begin{table}[H]
+    \centering
+    \caption{Reglas de tratamiento de valores nulos.}
+    \label{tab:nulos-reglas}
+    \small
+    \begin{tabular}{|p{0.22\textwidth}|p{0.30\textwidth}|p{0.38\textwidth}|}
+        \hline
+        \textbf{Variable} & \textbf{¿Se imputa?} & \textbf{Criterio} \\
+        \hline
+        \texttt{listeners} & Sí & Mediana por género principal (grupo $\geq 5$); si no, mediana global \\
+        \hline
+        \texttt{playcount} & Sí & Mismo criterio que \texttt{listeners} \\
+        \hline
+        \texttt{deezer\_fans} & Sí & Mismo criterio que \texttt{listeners} \\
+        \hline
+        Similitud & No & Información ausente real \\
+        \hline
+        Género & No & Información ausente real \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\section{Características y variables del modelo}
 \label{sec:caracteristicas}
 
+A partir de las tablas anteriores se derivan las variables que alimentan el análisis:
+
 \begin{itemize}
-    \item Frecuencia de cada género musical, global y por usuario.
-    \item Grado de coincidencia de artistas entre los tres rangos temporales (estabilidad del gusto musical).
-    \item Grado de solapamiento entre los perfiles musicales de los dos usuarios (artistas y géneros en común).
-    \item Posición en el \emph{ranking} como indicador de intensidad de escucha (los primeros puestos de cada rango representan los artistas más escuchados).
-    \item Popularidad del artista (oyentes/\emph{playcount} de Last.fm) frente a su posición en el \emph{ranking} personal, para ver si los autores escuchan más artistas populares o más de nicho.
+    \item \textbf{Frecuencia de género}: número de artistas distintos asociados a cada género, global y por usuario, para evitar que un artista repetido en tres rangos cuente tres veces.
+    \item \textbf{Diversidad}: número de artistas, número de géneros, entropía de Shannon (base 2) de la distribución de géneros y cuota del género principal.
+    \item \textbf{Estabilidad temporal}: similitud entre los conjuntos de artistas de cada par de rangos (Jaccard) y entre los vectores de frecuencia de género (coseno).
+    \item \textbf{Compatibilidad entre usuarios}: las mismas dos métricas aplicadas a los perfiles de ambos autores, por rango y en el conjunto de los tres rangos.
+    \item \textbf{Popularidad frente a ranking}: correlación de Spearman entre la posición en el ranking y el logaritmo de los oyentes de Last.fm, por usuario y rango.
+    \item \textbf{Afinidad usuario--artista}: puntuación continua en $[0,1]$ para artistas ajenos al historial, descrita en el \S\ref{sec:recomendacion}.
+    \item \textbf{Grupo de artista}: asignación de cada artista a un clúster por su vector binario de géneros, descrita en el \S\ref{sec:clustering}.
 \end{itemize}
 
-\section{Líneas de trabajo planteadas}
-\label{sec:lineas-trabajo}
+\section{Métodos de análisis}
+\label{sec:metodos}
 
-A partir de los datos disponibles y de los enriquecimientos previstos, se plantean tres líneas de análisis complementarias. Todas ellas son ideas de partida y podrán ajustarse conforme avance el proyecto.
-
-\subsection{Compatibilidad musical entre los dos usuarios}
+\subsection{Compatibilidad y estabilidad}
 \label{sec:compatibilidad}
 
-Dado que se dispone de un conjunto de datos equivalente para cada autor (\texttt{top\_artistas.csv} y \texttt{top\_artistasJorge.csv}), se plantea calcular un \textbf{índice de compatibilidad musical} entre ambos, por ejemplo mediante el coeficiente de Jaccard sobre el conjunto de artistas o géneros en común, o mediante la similitud del coseno entre los vectores de frecuencia de género de cada usuario. Este índice podría calcularse también por rango temporal, para ver si la compatibilidad es mayor en el gusto reciente que en el histórico.
+Para dos conjuntos de artistas $A$ y $B$ se usa el coeficiente de Jaccard:
+\[
+J(A,B) = \frac{|A \cap B|}{|A \cup B|},
+\]
+que vale 1 cuando los conjuntos coinciden y 0 cuando son disjuntos. Para los géneros se construye un vector de frecuencias por usuario y rango, alineado sobre la unión de géneros, y se calcula la similitud del coseno:
+\[
+\cos(\mathbf{u},\mathbf{v}) = \frac{\mathbf{u}\cdot\mathbf{v}}{\|\mathbf{u}\|\,\|\mathbf{v}\|}.
+\]
+Ambas métricas se calculan para cada par de rangos (estabilidad) y entre usuarios (compatibilidad), incluyendo una fila global que agrega los tres rangos. El resultado se interpreta de forma descriptiva: con dos usuarios no se plantea contraste de hipótesis ni generalización poblacional.
 
-\subsection{Afinidad usuario--artista (recomendación por similitud)}
+\subsection{Afinidad usuario--artista}
 \label{sec:recomendacion}
 
-Se plantea explorar si, dado un artista nuevo (no presente en el historial de un usuario), se puede estimar si le gustaría, sin necesidad de un clasificador supervisado clásico. La razón es que no existe una fuente fiable de ejemplos \emph{negativos}: la API de Spotify no expone artistas bloqueados u ocultados por el usuario, y tratar como negativo un artista con menos escuchas o presente solo en \texttt{long\_term} sería un sustituto débil y discutible. En su lugar, se propone un enfoque basado en \textbf{similitud de contenido}:
+No existe una fuente fiable de ejemplos negativos (Spotify no expone artistas bloqueados u ocultados), por lo que se descarta un clasificador supervisado y se opta por un enfoque de \textbf{similitud de contenido}. Para cada usuario $u$ se define el peso de un artista $a$ de su historial como
+\[
+w_u(a) = \frac{51 - \min_r \text{posición}_r(a)}{50},
+\]
+de modo que el primer puesto de cualquier rango pesa aproximadamente 1 y el puesto 50 pesa 0,02. Para un artista candidato $c$ con vecinos similares $s \in \mathrm{Sim}(c)$ y puntuaciones de similitud $\mathrm{match}(c,s)$, la afinidad estimada es
+\[
+S(c,u) = \frac{\sum_{s \in \mathrm{Sim}(c)} \mathrm{match}(c,s)\, w_u(s)}{\sum_{s \in \mathrm{Sim}(c)} \mathrm{match}(c,s)}.
+\]
+La puntuación es nula si el artista no tiene vecinos. Los candidatos se generan a partir de los diez artistas mejor situados de cada usuario, se excluyen los que ya aparecen en cualquier historial y se conservan los veinte con mayor similitud media.
 
-\begin{enumerate}
-    \item A partir de \texttt{artist.getSimilar} (Last.fm), obtener los artistas más cercanos al artista candidato.
-    \item Calcular qué proporción de esos artistas similares ya están presentes en el historial del usuario (y con qué peso, según su posición en el \emph{ranking}).
-    \item Usar ese solapamiento como medida de afinidad estimada, en lugar de una predicción binaria estricta de ``le gusta / no le gusta''.
-\end{enumerate}
+Como comprobación descriptiva se aplica un esquema \emph{leave-one-out}: se oculta cada artista del top-10, se recalcula su puntuación sin él y se compara con la de los candidatos-control mediante medianas y la prueba U de Mann-Whitney. No es una evaluación supervisada ni una medida de acierto predictivo; solo indica si la señal ordena razonablemente los artistas conocidos por encima de los ajenos.
 
-\subsection{Agrupamiento (\emph{clustering})}
-\label{sec:clustering-previsto}
+\subsection{Agrupamiento de artistas}
+\label{sec:clustering}
 
-En línea con lo trabajado en la práctica de aprendizaje no supervisado de la asignatura, se plantea explorar una codificación de cada artista mediante sus géneros (variables \emph{dummy} uno por género) para aplicar un algoritmo de \emph{clustering} (p. ej. K-Means) que agrupe artistas o usuarios por afinidad de género, de forma análoga al análisis de clientes realizado en la Práctica~3 de Aprendizaje Automático.
+Cada artista se representa por un vector binario de géneros (1 si el artista tiene ese género). Se conservan los géneros presentes en al menos dos artistas y los artistas con al menos un género; las exclusiones se documentan. Sobre esa matriz se aplica K-Means con semilla fija ($42$) y diez inicializaciones. El número de grupos se elige en el rango $k \in [2,8]$ combinando el método del codo (inercia) y el coeficiente de silueta, prefiriendo el $k$ menor cuando las diferencias de silueta son inferiores a 0,02. Los grupos se etiquetan por los tres géneros con mayor prevalencia relativa y se proyectan en dos dimensiones mediante PCA, que es solo una ayuda visual: el agrupamiento se realiza en el espacio completo de géneros.
+
+\section{Decisiones de implementación y reproducibilidad}
+\label{sec:reproducibilidad-modelo}
+
+\begin{itemize}
+    \item \textbf{Semilla fija} ($42$) en K-Means y en cualquier proceso aleatorio.
+    \item \textbf{Caché persistente} de enriquecimiento para evitar llamadas repetidas y garantizar que dos ejecuciones producen los mismos datos.
+    \item \textbf{Credenciales fuera del repositorio}: el fichero \texttt{.env} y la caché de tokens no se versionan; los CSV con nombres de artistas tampoco.
+    \item \textbf{Salidas separadas}: las tablas con nombres de artistas quedan en local y solo se publican agregados y figuras sin etiquetas identificativas.
+    \item \textbf{Parámetros explícitos}: número de similares (20), mínimo de soporte de género (2), mínimo de artistas por grupo para imputar (5) y rango de $k$ (2--8) están definidos como constantes del módulo.
+\end{itemize}
+
+\section{Limitaciones del modelo}
+\label{sec:limitaciones-modelo}
+
+\begin{itemize}
+    \item \textbf{Dos usuarios}: los índices de compatibilidad describen a estos dos autores, no a una población.
+    \item \textbf{Etiquetas de género colaborativas}: Last.fm es una folksonomía; las etiquetas pueden ser ruidosas, redundantes o mezclar género con país o época.
+    \item \textbf{Datos dinámicos}: el top de Spotify cambia con el tiempo; ambos CSV deben extraerse el mismo día y la fecha se registra con los metadatos.
+    \item \textbf{Cobertura desigual}: los artistas de nicho tienen menos probabilidades de estar en Last.fm o Deezer, lo que puede sesgar las comparaciones de popularidad.
+    \item \textbf{Sin características de audio}: la retirada de \texttt{audio-features} impide usar \emph{danceability}, \emph{energy} u otras variables acústicas.
+\end{itemize}

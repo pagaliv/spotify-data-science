@@ -9,56 +9,101 @@
 \section{Herramientas y librerías utilizadas}
 \label{sec:herramientas}
 
-El tratamiento de los datos se ha realizado íntegramente en Python, dentro de un cuaderno Jupyter (\texttt{TrabajoTecnicasDeCienciaDeDatos.ipynb}), utilizando las siguientes librerías:
+El proyecto se ha desarrollado íntegramente en Python, dentro de un entorno virtual reproducible descrito en \texttt{requirements.txt}. El trabajo se reparte entre dos cuadernos Jupyter y un módulo de funciones:
+
+\begin{itemize}
+    \item \texttt{TrabajoTecnicasDeCienciaDeDatos.ipynb}: extracción de los artistas más escuchados y de sus géneros.
+    \item \texttt{AnalisisTecnicasDeCienciaDeDatos.ipynb}: consolidación, enriquecimiento, análisis y generación de figuras.
+    \item \texttt{spotify\_analisis.py}: funciones puras reutilizables por ambos cuadernos.
+\end{itemize}
+
+La Tabla~\ref{tab:librerias} recoge las librerías empleadas y su función.
 
 \begin{table}[H]
     \centering
-    \renewcommand{\arraystretch}{1.5}
-    \begin{tabular}{|p{0.22\textwidth}|p{0.6\textwidth}|}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{|p{0.24\textwidth}|p{0.58\textwidth}|}
         \hline
         \textbf{Librería} & \textbf{Uso en el proyecto} \\
         \hline
-        \texttt{spotipy} & Cliente Python para la Spotify Web API; gestiona el flujo OAuth y las peticiones a los \emph{endpoints} de artistas más escuchados. \\
+        \texttt{spotipy} & Cliente de la Spotify Web API; gestiona el flujo OAuth y las peticiones a \texttt{current\_user\_top\_artists}. \\
         \hline
-        \texttt{requests} & Peticiones HTTP directas al \emph{endpoint} REST de Last.fm (\texttt{artist.gettoptags}). \\
+        \texttt{requests} & Peticiones HTTP a Last.fm y Deezer, con reintentos y control de errores. \\
         \hline
-        \texttt{pandas} & Construcción del \texttt{DataFrame} con los datos combinados y exportación a CSV. \\
+        \texttt{pandas} & Consolidación en formato largo, tablas derivadas, agregaciones y exportación. \\
         \hline
-        \texttt{python-dotenv} & Carga de credenciales desde el fichero local \texttt{.env}, evitando guardarlas en el código fuente. \\
+        \texttt{numpy} & Operaciones vectoriales y cálculo de la entropía. \\
         \hline
-        \texttt{matplotlib} & Prevista para la fase de visualización (Capítulo~\ref{chap:resultados}); instalada desde el inicio del proyecto. \\
+        \texttt{scipy} & Correlación de Spearman y prueba U de Mann-Whitney. \\
         \hline
-        \texttt{time} (estándar) & Introduce una pausa (\texttt{time.sleep(0.25)}) entre peticiones a Last.fm para respetar el límite de peticiones de su API. \\
+        \texttt{scikit-learn} & K-Means, coeficiente de silueta y proyección PCA. \\
+        \hline
+        \texttt{matplotlib} y \texttt{seaborn} & Figuras del informe, con estilo homogéneo y 300 dpi. \\
+        \hline
+        \texttt{python-dotenv} & Carga de credenciales desde el fichero local \texttt{.env}. \\
+        \hline
+        \texttt{jupyterlab} & Ejecución interactiva de los cuadernos. \\
+        \hline
+        \texttt{time} y \texttt{json} (estándar) & Pausas entre peticiones y caché persistente de enriquecimiento. \\
         \hline
     \end{tabular}
-    \caption{Librerías empleadas en la fase de obtención y tratamiento de datos.}
+    \caption{Librerías empleadas en el proyecto.}
     \label{tab:librerias}
 \end{table}
 
 \section{Formato de los datos}
 \label{sec:formato}
 
-Se ha optado por \textbf{CSV} (valores separados por comas) como formato de intercambio y almacenamiento, codificado en \texttt{utf-8-sig} para preservar correctamente los caracteres no latinos presentes en los datos (nombres de artistas en japonés, coreano, etc.) y mantener compatibilidad con Excel. CSV es un formato de datos estructurado y en texto plano, adecuado para un conjunto de datos de tamaño reducido (decenas de filas) que se procesará posteriormente con \texttt{pandas}, frente a alternativas más orientadas a grandes volúmenes o datos jerárquicos como HDF5 (vista en la Sesión~3 de la asignatura), que no se justifican para este volumen de datos.
+Se ha optado por \textbf{CSV} (valores separados por comas) para los datos de extracción y los agregados, codificado en \texttt{utf-8-sig} para preservar correctamente los caracteres no latinos presentes en los nombres de artistas (japonés, coreano, etc.) y mantener compatibilidad con Excel. Es un formato estructurado y legible, adecuado para un volumen de decenas o cientos de filas que se procesa con \texttt{pandas}; alternativas orientadas a grandes volúmenes o datos jerárquicos, como HDF5 o Parquet, no aportan ventajas con este tamaño y dificultan la inspección manual.
 
-\section{Proceso de obtención y combinación}
+La \textbf{caché de enriquecimiento} se guarda en \textbf{JSON} porque su estructura es anidada (por artista, con listas de similares) y porque permite reanudar el proceso sin repetir llamadas a las APIs. Los metadatos de la extracción y las métricas finales también se exportan en JSON, que es directamente consumible por el informe y por cualquier validación posterior.
+
+\section{Proceso de obtención de los datos base}
 \label{sec:proceso}
 
-El proceso implementado sigue los siguientes pasos:
+El proceso implementado en el cuaderno de extracción sigue estos pasos:
 
 \begin{enumerate}
-    \item \textbf{Autenticación}: se cargan las credenciales desde \texttt{.env} y se inicializa el cliente \texttt{spotipy.Spotify} con el \emph{scope} \texttt{user-top-read}.
-    \item \textbf{Descarga de artistas por rango}: para cada uno de los tres rangos temporales (Tabla~\ref{tab:rangos}), se solicita a la API de Spotify el \emph{top} 50 de artistas más escuchados (\texttt{current\_user\_top\_artists}) y se añade cada uno a una lista de registros con su posición, nombre y enlace de Spotify.
-    \item \textbf{Deduplicación antes de consultar géneros}: dado que un mismo artista puede repetirse en varios rangos, se extrae el conjunto de artistas \emph{únicos} (\texttt{df["artista"].unique()}) antes de consultar Last.fm, para minimizar el número de peticiones a la API externa y respetar sus límites de uso.
-    \item \textbf{Consulta de géneros en Last.fm}: para cada artista único se solicita el \emph{endpoint} \texttt{artist.gettoptags}, que devuelve etiquetas junto con un peso (\emph{count}) entre 0 y 100. Se seleccionan como máximo 4 etiquetas con peso igual o superior a 20, descartando las etiquetas no musicales recogidas en el conjunto \texttt{IGNORAR} (nacionalidades, tipo de voz, etc.).
-    \item \textbf{Combinación}: los géneros obtenidos se incorporan al \texttt{DataFrame} original mediante un \emph{mapeo} artista~$\rightarrow$~géneros (\texttt{df["generos"] = df["artista"].map(cache)}), evitando así repetir la consulta a Last.fm para un mismo artista que aparece en varios rangos.
-    \item \textbf{Exportación}: el resultado final se guarda como \texttt{top\_artistas.csv}, con las columnas \texttt{rango}, \texttt{posicion}, \texttt{artista}, \texttt{generos} y \texttt{spotify\_url} (Tabla~\ref{tab:esquema}).
+    \item \textbf{Autenticación}: se cargan las credenciales desde \texttt{.env} y se inicializa el cliente \texttt{spotipy.Spotify} con el \emph{scope} \texttt{user-top-read}. El token se cachea localmente.
+    \item \textbf{Descarga de artistas por rango}: para cada uno de los tres rangos temporales (Tabla~\ref{tab:rangos}), se solicita el \emph{top} 50 de artistas más escuchados (\texttt{current\_user\_top\_artists}) y se añade cada uno a una lista de registros con su posición, nombre y enlace de Spotify.
+    \item \textbf{Deduplicación antes de consultar géneros}: dado que un mismo artista puede repetirse en varios rangos, se extrae el conjunto de artistas \emph{únicos} antes de consultar Last.fm, para minimizar el número de peticiones y respetar sus límites de uso.
+    \item \textbf{Consulta de géneros en Last.fm}: para cada artista único se solicita \texttt{artist.gettoptags}, que devuelve etiquetas con un peso (\emph{count}) entre 0 y 100. Se seleccionan como máximo 4 etiquetas con peso igual o superior a 20, descartando las etiquetas no musicales recogidas en el conjunto \texttt{IGNORAR} (nacionalidades, tipo de voz, metaetiquetas).
+    \item \textbf{Combinación}: los géneros se incorporan al \texttt{DataFrame} mediante un mapeo artista~$\rightarrow$~géneros, evitando repetir la consulta para un artista presente en varios rangos.
+    \item \textbf{Exportación}: el resultado se guarda como \texttt{top\_artistas.csv} o \texttt{top\_artistasJorge.csv} según el autor, con las columnas \texttt{rango}, \texttt{posicion}, \texttt{artista}, \texttt{generos} y \texttt{spotify\_url} (Tabla~\ref{tab:esquema}).
 \end{enumerate}
+
+\section{Proceso de enriquecimiento}
+\label{sec:proceso-enriquecimiento}
+
+Sobre el conjunto de artistas únicos de ambos autores, el cuaderno de análisis realiza tres consultas por artista:
+
+\begin{enumerate}
+    \item \textbf{Last.fm \texttt{artist.getInfo}}: oyentes, reproducciones e identificador MusicBrainz.
+    \item \textbf{Last.fm \texttt{artist.getSimilar}}: hasta 20 artistas similares con su \emph{match score}.
+    \item \textbf{Deezer}: búsqueda pública del artista para obtener fans y número de álbumes.
+\end{enumerate}
+
+Las respuestas se guardan en \texttt{cache/enriquecimiento.json} con una clave por artista y fuente. Antes de cada llamada se comprueba la caché, de modo que una segunda ejecución no repite peticiones. Se aplica una pausa de 0,25~s en Last.fm y 0,1~s en Deezer, y se reintenta con espera creciente ante errores 429 o 5xx. Los artistas no encontrados se almacenan con valores nulos y la bandera \texttt{fuente\_encontrada=False} para no reintentarlos indefinidamente. La URL de las peticiones, que contiene la \emph{API key}, nunca se escribe en los registros.
+
+\section{Privacidad y reproducibilidad}
+\label{sec:privacidad}
+
+Los datos de partida son personales: identifican los gustos musicales de los dos autores. Por ello:
+
+\begin{itemize}
+    \item Los CSV crudos (\texttt{top\_artistas*.csv}), el fichero \texttt{.env}, la caché de tokens (\texttt{.cache}) y la caché de enriquecimiento no se versionan; están excluidos en \texttt{.gitignore}.
+    \item Solo se publican agregados sin nombres de artistas (\texttt{resultados/*.csv} y \texttt{resultados/metricas.json}) y las figuras, que tampoco etiquetan artistas individuales salvo en los análisis agregados.
+    \item Cada autor ejecuta la extracción con su propia cuenta; el token de acceso es intransferible aunque las credenciales de la aplicación se compartan.
+    \item La extracción de ambos autores se realiza el mismo día y la fecha se registra en \texttt{resultados/extraccion\_meta.json} para acotar la deriva temporal.
+    \item La semilla de los procesos aleatorios es fija ($42$) y los parámetros relevantes (número de similares, soporte mínimo de género, mínimo de artistas por grupo para imputar y rango de $k$) están definidos como constantes del módulo.
+\end{itemize}
 
 \section{Decisiones de diseño}
 \label{sec:decisiones}
 
 \begin{itemize}
-    \item Se ha mantenido una primera versión simplificada del script (sin consulta a Last.fm) junto a la versión final, documentando así la evolución del proceso de obtención de datos: primero se validó el acceso a la API de Spotify y, una vez funcionando, se añadió el enriquecimiento con géneros.
-    \item El límite de \textbf{4 géneros por artista} y el \textbf{umbral mínimo de peso 20} se han fijado de forma manual para equilibrar la riqueza de información (más géneros) con la precisión (evitar etiquetas minoritarias o poco representativas).
-    \item Cada autor ejecuta el proceso de forma independiente sobre su propia cuenta de Spotify, generando un CSV por persona (p. ej. \texttt{top\_artistasJorge.csv}), lo que permitirá posteriormente comparar los perfiles musicales de ambos.
+    \item Se ha mantenido una primera versión simplificada del script (sin consulta a Last.fm) junto a la versión final, documentando así la evolución del proceso: primero se validó el acceso a la API de Spotify y, una vez funcionando, se añadió el enriquecimiento con géneros.
+    \item El límite de \textbf{4 géneros por artista} y el \textbf{umbral mínimo de peso 20} se fijaron para equilibrar riqueza informativa y precisión, evitando etiquetas minoritarias o poco representativas.
+    \item La lógica de análisis se extrajo a un módulo independiente para que el cuaderno sea legible y para poder reutilizar las mismas funciones con otros usuarios o con una nueva extracción.
+    \item Cada autor ejecuta el proceso sobre su propia cuenta, generando un CSV por persona, lo que permite comparar los perfiles musicales sin mezclar datos personales en el repositorio.
 \end{itemize}

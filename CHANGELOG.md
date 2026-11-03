@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4 - Entorno reproducible, módulo de análisis y datos regenerados
+Se consolida el proyecto como un entorno reproducible (venv, `requirements.txt`, `.env.example`, `.gitignore`) y se separa la lógica de análisis en un módulo propio. El cuaderno de extracción se parametriza por autor y se regeneran los datos con las credenciales actuales. Se añade el cuaderno de análisis, que consolida ambos CSV, enriquece con Last.fm (`getInfo`, `getSimilar`) y Deezer, cuantifica y trata nulos, y calcula compatibilidad, popularidad, afinidad y agrupamiento. Se actualizan los capítulos 1-4 del informe con el diseño final.
+
+### Detalle por subversión:
+- `v0.4.0.1`: `add(env)`: `.gitignore` (datos personales, `.env`, caché y auxiliares LaTeX), `requirements.txt` con versiones compatibles y `.env.example`.
+- `v0.4.0.2`: `mod(notebook)`: parametrización `USUARIO`/`ARCHIVO_SALIDA`, instrucciones por autor, dependencias desde `requirements.txt` y salidas limpias antes de versionar.
+- `v0.4.0.3`: `add(analisis)`: módulo `spotify_analisis.py` con carga y validación, géneros, métricas de similitud, enriquecimiento con caché, nulos, afinidad y clustering.
+- `v0.4.0.4`: `data`: extracción del autor Pablo (150 filas, 3 rangos × 50, 74 artistas únicos) y metadatos en `resultados/extraccion_meta.json`.
+- `v0.4.0.5`: `add(analisis)`: cuaderno `AnalisisTecnicasDeCienciaDeDatos.ipynb` con las diez secciones del análisis y exportación de métricas.
+- `v0.4.0.6`: `doc`: capítulos 1-4 reescritos con el alcance final (Last.fm/Deezer, MusicBrainz descartada, modelo de datos, nulos y métodos).
+- `v0.4.0.7`: `fix(analisis)`: carga explícita de `.env` en el cuaderno de análisis para que el enriquecimiento disponga de `LASTFM_API_KEY`.
+
 ## v0.3 - Primer borrador del informe (LaTeX)
 Se añade un primer borrador del informe del proyecto en `doc/`, siguiendo la plantilla LaTeX usada en las prácticas del máster (`main.tex` + `preliminares/portada.tex` + `capitulos/`). El informe cubre en detalle el planteamiento del problema, las fuentes de datos (Spotify Web API + Last.fm) y el proceso de obtención y tratamiento ya implementado en el notebook; el diseño del modelo de datos, los resultados/visualización y las conclusiones quedan como esquema de trabajo pendiente de completar con el análisis definitivo.
 

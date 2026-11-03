@@ -65,7 +65,10 @@ It is written in parentheses immediately after the action, with **no spaces**.
 Common scopes in this project:
 
 - `notebook` — `TrabajoTecnicasDeCienciaDeDatos.ipynb`
+- `analisis` — `AnalisisTecnicasDeCienciaDeDatos.ipynb` y `spotify_analisis.py`
 - `data` — ficheros CSV generados (`top_artistas*.csv`)
+- `resultados` — tablas agregadas y `resultados/metricas.json`
+- `env` — `.gitignore`, `requirements.txt`, `.env.example` y entorno
 - `doc` — informe LaTeX (`doc/`)
 - `README`
 - `info` — enunciado y material de referencia de la asignatura

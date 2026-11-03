@@ -9,34 +9,37 @@
 \section{Fuentes de datos}
 \label{sec:fuentes}
 
-Siguiendo la clasificación de fuentes públicas de datos vista en la asignatura, este proyecto utiliza dos fuentes encuadradas en la categoría de \textbf{APIs y datos en tiempo real / redes sociales}:
+Siguiendo la clasificación de fuentes públicas de datos vista en la asignatura, este proyecto utiliza tres fuentes encuadradas en la categoría de \textbf{APIs y datos en tiempo real / redes sociales}:
 
 \begin{itemize}
     \item \textbf{Spotify Web API}, a través de la librería \texttt{spotipy} para Python. Es la fuente primaria: proporciona, para el usuario autenticado, su lista de artistas más escuchados (\texttt{current\_user\_top\_artists}) en tres rangos temporales.
-    \item \textbf{Last.fm API} (\texttt{artist.gettoptags}), utilizada como fuente secundaria para enriquecer cada artista con sus géneros musicales más representativos, ya que la API de Spotify para usuarios individuales no siempre ofrece esta información con el mismo nivel de detalle que Last.fm.
+    \item \textbf{Last.fm API}, fuente secundaria de tres tipos de información: los géneros más representativos de cada artista (\texttt{artist.gettoptags}), sus métricas de popularidad (\texttt{artist.getInfo}) y su vecindad de artistas similares con una puntuación de similitud (\texttt{artist.getSimilar}).
+    \item \textbf{Deezer API pública}, utilizada como segunda medida de popularidad (número de fans y álbumes) y para contrastar la cobertura de Last.fm. No requiere autenticación.
 \end{itemize}
 
-A diferencia de los portales de datos abiertos gubernamentales o los repositorios de \emph{Machine Learning} vistos en la Sesión~1 (Kaggle, UCI, datos.gob.es, etc.), estas dos fuentes requieren autenticación mediante credenciales de desarrollador (\emph{API keys} / OAuth) y devuelven datos \textbf{personales y dinámicos}: el resultado depende del usuario autenticado y cambia con el tiempo según sus hábitos de escucha.
+A diferencia de los portales de datos abiertos gubernamentales o los repositorios de \emph{Machine Learning} vistos en la Sesión~1 (Kaggle, UCI, datos.gob.es, etc.), estas fuentes requieren autenticación mediante credenciales de desarrollador (\emph{API keys} / OAuth) y devuelven datos \textbf{personales y dinámicos}: el resultado depende del usuario autenticado y cambia con el tiempo según sus hábitos de escucha.
+
+Se evaluó también \textbf{MusicBrainz} como fuente de metadatos canónicos (país de origen, año de actividad o identificadores estables). Se descartó porque, sin un análisis geográfico en el alcance del proyecto, no aportaba variables que respondieran a las preguntas planteadas y añadía una consulta adicional por artista.
 
 \section{Acceso a los datos}
 \label{sec:acceso}
 
 \subsection{Autenticación en Spotify}
 
-El acceso a los datos de Spotify requiere registrar una aplicación en el panel de desarrolladores de Spotify para obtener un \texttt{Client ID} y un \texttt{Client Secret}, y autenticar al usuario mediante el flujo OAuth \emph{Authorization Code Flow}, gestionado por \texttt{spotipy.oauth2.SpotifyOAuth}. El \emph{scope} solicitado es \texttt{user-top-read}, que da acceso de solo lectura a los artistas y canciones más escuchados por el usuario.
+El acceso a los datos de Spotify requiere registrar una aplicación en el panel de desarrolladores de Spotify para obtener un \texttt{Client ID} y un \texttt{Client Secret}, y autenticar al usuario mediante el flujo OAuth \emph{Authorization Code Flow}, gestionado por \texttt{spotipy.oauth2.SpotifyOAuth}. El \emph{scope} solicitado es \texttt{user-top-read}, que da acceso de solo lectura a los artistas y canciones más escuchados por el usuario. El token se guarda en una caché local que no se versiona.
 
-\subsection{Autenticación en Last.fm}
+\subsection{Autenticación en Last.fm y Deezer}
 
-El acceso a Last.fm se realiza mediante una \texttt{API key} simple, enviada como parámetro en cada petición HTTP al \emph{endpoint} \texttt{artist.gettoptags}.
+Last.fm se consulta con una \texttt{API key} simple enviada como parámetro en cada petición HTTP. Deezer expone un \emph{endpoint} de búsqueda público que no requiere credenciales. En ambos casos se aplica una pausa entre peticiones y reintentos con espera creciente ante errores temporales o límites de frecuencia.
 
 \subsection{Gestión de credenciales}
 
-Las credenciales (\texttt{SPOTIPY\_CLIENT\_ID}, \texttt{SPOTIPY\_CLIENT\_SECRET}, \texttt{SPOTIPY\_REDIRECT\_URI} y \texttt{LASTFM\_API\_KEY}) se almacenan en un fichero \texttt{.env} local, cargado mediante la librería \texttt{python-dotenv}, y no se incluyen en el repositorio del proyecto por motivos de seguridad.
+Las credenciales (\texttt{SPOTIPY\_CLIENT\_ID}, \texttt{SPOTIPY\_CLIENT\_SECRET}, \texttt{SPOTIPY\_REDIRECT\_URI} y \texttt{LASTFM\_API\_KEY}) se almacenan en un fichero \texttt{.env} local, cargado mediante la librería \texttt{python-dotenv}, y no se incluyen en el repositorio del proyecto por motivos de seguridad. Cada autor ejecuta la extracción con su propia cuenta de Spotify; las credenciales de la aplicación pueden compartirse, pero el token de acceso es personal.
 
 \section{Datos obtenidos}
 \label{sec:datos-obtenidos}
 
-Para cada uno de los dos autores del trabajo se ha ejecutado el proceso de extracción, obteniendo un listado de hasta 50 artistas por cada uno de los tres rangos temporales que ofrece la API de Spotify:
+Para cada uno de los dos autores del trabajo se ejecuta el proceso de extracción, obteniendo un listado de hasta 50 artistas por cada uno de los tres rangos temporales que ofrece la API de Spotify:
 
 \begin{table}[H]
     \centering
@@ -80,14 +83,44 @@ Para cada artista se recogen los siguientes campos:
     \label{tab:esquema}
 \end{table}
 
-A modo de ejemplo, un artista puede aparecer repetido en los tres rangos (si lleva tiempo siendo escuchado de forma constante) o solo en uno de ellos (si es un descubrimiento reciente o un gusto puntual del pasado), lo cual es en sí mismo una variable de interés para el análisis de la estabilidad del gusto musical.
+Cada autor aporta un máximo de 150 filas (50 por rango). El número de artistas únicos es inferior porque un mismo artista puede aparecer en varios rangos; esa repetición es en sí misma una variable de interés para el análisis de la estabilidad del gusto musical. La extracción de ambos autores se realiza en una única fecha, registrada junto con los recuentos en \texttt{resultados/extraccion\_meta.json}.
+
+Sobre esa base, la tabla de artistas se amplía con los campos de la Tabla~\ref{tab:campos-datos}.
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.4}
+    \caption{Campos adicionales incorporados por artista.}
+    \label{tab:campos-datos}
+    \small
+    \begin{tabular}{|p{0.26\textwidth}|p{0.22\textwidth}|p{0.42\textwidth}|}
+        \hline
+        \textbf{Campo} & \textbf{Fuente} & \textbf{Descripción} \\
+        \hline
+        \texttt{listeners} & Last.fm & Número de oyentes únicos del artista \\
+        \hline
+        \texttt{playcount} & Last.fm & Reproducciones totales registradas \\
+        \hline
+        \texttt{mbid} & Last.fm & Identificador MusicBrainz del artista \\
+        \hline
+        \texttt{similar\_top} & Last.fm & Artista más similar y su \emph{match score} \\
+        \hline
+        \texttt{n\_similares} & Last.fm & Número de vecinos similares recuperados \\
+        \hline
+        \texttt{deezer\_fans} & Deezer & Número de fans en Deezer \\
+        \hline
+        \texttt{deezer\_nb\_album} & Deezer & Número de álbumes en Deezer \\
+        \hline
+    \end{tabular}
+\end{table}
 
 \section{Problemas de calidad e integración detectados}
 \label{sec:calidad}
 
 \begin{itemize}
-    \item \textbf{Cobertura incompleta de géneros}: no todos los artistas tienen etiquetas en Last.fm, especialmente bandas sonoras de videojuegos o artistas japoneses minoritarios (p. ej. \texttt{ATLUS GAME MUSIC} o compositores japoneses con pocos oyentes en Last.fm), que aparecen sin género asignado.
+    \item \textbf{Cobertura incompleta de géneros}: no todos los artistas tienen etiquetas en Last.fm, especialmente bandas sonoras de videojuegos o artistas japoneses minoritarios (p. ej. \texttt{ATLUS GAME MUSIC} o compositores con pocos oyentes en Last.fm), que aparecen sin género asignado.
     \item \textbf{Etiquetas de Last.fm ruidosas}: Last.fm permite etiquetas libres de usuario, por lo que junto a géneros reales aparecen etiquetas de nacionalidad (\texttt{spanish}, \texttt{japanese}, \texttt{taiwan}) o metaetiquetas sin valor musical (\texttt{seen live}, \texttt{favorites}, \texttt{my top songs}). Se ha aplicado un filtro manual (\texttt{IGNORAR}) para excluir las etiquetas más comunes de este tipo, aunque no es exhaustivo.
+    \item \textbf{Cobertura desigual entre fuentes}: los artistas de nicho tienen menos probabilidades de estar dados de alta en Last.fm y Deezer, por lo que los valores nulos no se distribuyen al azar. Su cuantificación y tratamiento se detallan en el Capítulo~\ref{chap:modelo}.
     \item \textbf{Redundancia entre rangos}: un mismo artista puede aparecer hasta tres veces (una por rango), por lo que el fichero combinado no está en forma de tabla \emph{artista--atributos} única, sino en formato largo (\emph{long format}), con una fila por combinación artista-rango.
-    \item \textbf{Normalización de nombres}: los nombres de artistas provienen directamente de Spotify y se usan tal cual para consultar Last.fm; en caso de alias distintos entre ambas plataformas, la búsqueda de género puede fallar silenciosamente (se guarda cadena vacía).
+    \item \textbf{Normalización de nombres}: los nombres de artistas provienen directamente de Spotify y se usan tal cual para consultar Last.fm y Deezer; en caso de alias distintos entre plataformas, la búsqueda puede fallar silenciosamente (se guarda cadena vacía o valor nulo).
 \end{itemize}

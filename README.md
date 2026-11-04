@@ -5,7 +5,8 @@ de la Rioja): recogida de los artistas más escuchados en Spotify, enriquecidos 
 géneros y similitud de Last.fm y con popularidad de Deezer, para analizar y comparar
 el gusto musical de dos usuarios.
 
-> **Versión actual: v0.5.0.5** — ver [Changelog](CHANGELOG.md).
+> **Versión actual: v1.0.2** — ver [Changelog](CHANGELOG.md).
+
 
 ## Stack
 

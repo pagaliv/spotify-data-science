@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0 - Primera versión definitiva y preparación de la entrega
+Se consolida el análisis y el informe completos descritos en v0.5 como primera versión definitiva. Se prepara la entrega del aula virtual conforme a las indicaciones del profesorado: el PDF mantiene la autoría en la portada y el cuaderno de análisis identifica al principio a los dos autores y la procedencia de los datos. El paquete local de entrega reúne el cuaderno ejecutado, los CSV originales, la caché de enriquecimiento, las tablas agregadas, las figuras y el informe; los datos personales y las copias ejecutadas permanecen fuera del repositorio.
+
+### Detalle por subversión:
+- `v1.0.0.1:doc(entrega)`: primera celda del cuaderno de análisis con título, autores, curso y nota sobre los CSV y la caché; paquete de entrega generado en `cache/entrega/` (ignorado por Git) sin modificar los datos originales ni las cifras del informe.
+
 ## v0.5 - Análisis de los dos perfiles e informe final
 Se analizan los dos CSV recibidos sin regenerarlos ni completar posiciones ficticias: 298 filas, 140 artistas únicos y 5 compartidos. Se corrigen métricas, integración de APIs y afinidad; se generan resultados agregados y diez figuras, y se completan los seis capítulos del informe con fundamento explícito en el material docente. Se mantiene desconocida la fecha original de Jorge y se separa de la fecha de análisis (2026-11-04).
 

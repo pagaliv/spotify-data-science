@@ -1,36 +1,37 @@
-% ============================================
-% ===== CAPÍTULO 6: CONCLUSIONES =====
-% ============================================
-
-\chapter*{Conclusiones}
-\addcontentsline{toc}{chapter}{6. Conclusiones}
+\chapter{Conclusiones}
 \label{chap:conclusiones}
 
-\begin{tcolorbox}[colback=yellow!10, colframe=yellow!60!black, title=Pendiente de completar]
-Las conclusiones definitivas se redactarán una vez completado el análisis y la visualización de resultados (Capítulos~\ref{chap:modelo} y~\ref{chap:resultados}). A continuación se dejan algunas conclusiones preliminares, centradas en el propio proceso de obtención de datos.
-\end{tcolorbox}
-
-\section{Conclusiones sobre el proceso de obtención de datos}
-\label{sec:conclusiones-datos}
-
-\begin{itemize}
-    \item Combinar dos APIs externas (Spotify y Last.fm) permite enriquecer un conjunto de datos personal con información que ninguna de las dos fuentes ofrece de forma completa por sí sola, a costa de introducir ruido y huecos (artistas sin género) propios de combinar fuentes de distinta calidad y cobertura.
-    \item El uso de una caché en memoria por artista único, en lugar de consultar Last.fm una vez por cada fila del conjunto de datos, resultó clave para mantener el proceso dentro de los límites de peticiones de la API externa.
-    \item Trabajar con datos personales y dinámicos (dependientes del usuario autenticado y del momento de la consulta) implica que los resultados de este proyecto no son directamente reproducibles por un tercero sin sus propias credenciales y su propio historial de escucha, a diferencia de un conjunto de datos abierto y estático.
-\end{itemize}
-
-\section{Conclusiones del análisis}
+\section{Respuesta a las preguntas del proyecto}
 \label{sec:conclusiones-analisis}
 
-\textit{(Pendiente de redactar tras completar los Capítulos~\ref{chap:modelo} y~\ref{chap:resultados}: diversidad de géneros por usuario, estabilidad del gusto musical entre rangos temporales, grado de afinidad musical entre los dos autores y, en su caso, interpretación de los grupos obtenidos mediante \emph{clustering}.)}
+El análisis de 298 registros y 140 artistas únicos permite describir los perfiles de los dos autores, sin extrapolarlos a una población:
+
+\begin{enumerate}
+    \item \textbf{Los artistas concretos coinciden poco, pero las etiquetas comparten más estructura.} Solo cinco artistas son comunes y el Jaccard global es 0,0357. El coseno de etiquetas alcanza 0,4686. No son resultados contradictorios: comparan identidades y composiciones diferentes. Pablo presenta mayor presencia de etiquetas relacionadas con rap e hip-hop, mientras Jorge combina rock, alternative y etiquetas de bandas sonoras.
+    \item \textbf{La composición etiquetada es bastante estable entre ventanas solapadas.} Los cosenos dentro de cada usuario se sitúan entre 0,9471 y 0,9777, mientras los Jaccard de artistas van de 0,5152 a 0,6667. Cambian más los nombres concretos que la distribución de etiquetas. Esta observación no demuestra estabilidad futura ni una evolución longitudinal, porque los rangos se solapan.
+    \item \textbf{Jorge presenta mayor dispersión de etiquetas en esta muestra.} Sus entropías son superiores a las de Pablo en los tres rangos. La conclusión se refiere al vocabulario colaborativo obtenido, no a una escala objetiva de amplitud cultural: las etiquetas son múltiples, redundantes y de cobertura desigual.
+    \item \textbf{La posición personal no reproduce de forma uniforme la popularidad externa.} Las correlaciones cambian de signo entre ventanas y usuarios. El mayor valor es 0,3275 en el largo plazo de Pablo, pero no se convierte en una regla general a partir de seis comparaciones exploratorias. Last.fm y Deezer sí ofrecen medidas parcialmente concordantes en los 136 artistas con ambos datos ($\rho=0{,}6830$), sin ser medidas equivalentes.
+    \item \textbf{Calcular afinidad no equivale a recomendar para los dos usuarios.} Los veinte candidatos tienen datos suficientes, pero ninguno obtiene puntuación positiva en ambos perfiles. La media de puntuaciones puede destacar una coincidencia unilateral y no debe presentarse como consenso. La comprobación con favoritos ocultos describe el funcionamiento de la heurística, no su capacidad predictiva sobre valoraciones nuevas.
+    \item \textbf{El agrupamiento ofrece una descripción sencilla, pero débilmente separada.} La regla de silueta selecciona dos grupos sobre 133 artistas y 52 etiquetas, con silueta 0,1508. Un grupo ligado al rap está más representado en Pablo; el restante es amplio y heterogéneo. El 26,42\% de varianza explicado por la PCA bidimensional obliga a interpretar su imagen con cautela. No se han descubierto categorías musicales naturales ni validado un clasificador.
+\end{enumerate}
+
+\section{Aprendizajes del proceso de ciencia de datos}
+\label{sec:conclusiones-datos}
+
+La aportación del proyecto no se limita a calcular índices. Se ha recorrido un ciclo de definición del problema, comprensión de las fuentes, preparación, modelado exploratorio y comunicación, siguiendo el marco CRISP-DM presentado en la asignatura. La elección de CSV y JSON resulta proporcional a la escala del conjunto; Unicode conserva los nombres originales y las figuras PNG evitan pérdidas de compresión. Las representaciones responden a preguntas concretas y mantienen denominadores, escalas y colores comparables.
+
+La integración de fuentes exige distinguir dato ausente de error de servicio, coincidencia de nombre de búsqueda aproximada y observación real de valor imputado. También exige conservar a los artistas sin etiquetas cuando la métrica no necesita géneros. Excluirlos de Jaccard habría cambiado indebidamente su denominador; imputar popularidad antes de correlacionar habría añadido información artificial. La caché local y las pruebas con respuestas simuladas permiten controlar estas decisiones sin exponer credenciales ni repetir consultas válidas.
+
+El repositorio conserva código, agregados y figuras, pero no distribuye los rankings personales ni la caché. La reproducibilidad numérica requiere los mismos CSV y la misma instantánea de metadatos externos; nuevas consultas pueden devolver valores distintos. La fecha original de Jorge permanece desconocida, en vez de sustituirse por una fecha inferida.
 
 \section{Limitaciones y trabajo futuro}
 \label{sec:limitaciones}
 
 \begin{itemize}
-    \item El filtro de etiquetas no musicales de Last.fm (\texttt{IGNORAR}) es manual y no exhaustivo; podría mejorarse con una lista de géneros de referencia o un modelo de clasificación de etiquetas.
-    \item El análisis se limita a dos usuarios; las conclusiones sobre similitud/diversidad musical no son generalizables más allá de los propios autores.
-    \item La línea de afinidad usuario--artista (\S\ref{sec:recomendacion}) se apoya en similitud de contenido precisamente porque no existe una fuente fiable de ejemplos negativos (Spotify no expone artistas bloqueados/ocultados); un clasificador supervisado real de ``le gusta / no le gusta'' quedaría fuera del alcance de los datos disponibles.
-    \item La \emph{Spotify Web API} ya no ofrece, para aplicaciones nuevas, los \emph{endpoints} de \texttt{audio-features} ni \texttt{related-artists} (restringidos desde noviembre de 2024), lo que limita el enriquecimiento a lo que puedan aportar fuentes externas como Last.fm, Deezer o MusicBrainz (\S\ref{sec:enriquecimiento}).
-    \item Como ampliación, podría incorporarse también el historial de canciones más escuchadas (no solo artistas) además de los atributos de popularidad y similitud ya planteados.
+    \item \textbf{Muestra y selección}: solo hay dos usuarios y listas truncadas a un máximo de 50 artistas. No se observan todas las escuchas ni los minutos dedicados a cada artista; tampoco hay observaciones independientes por cada fila.
+    \item \textbf{Temporalidad}: las ventanas se solapan y no se acredita que las dos extracciones sean simultáneas. Para estudiar cambios reales harían falta instantáneas fechadas y repetidas con un protocolo común.
+    \item \textbf{Etiquetas}: el filtro manual no elimina todos los países, sinónimos o metaetiquetas. Una mejora sería construir un diccionario documentado de equivalencias, conservar también las etiquetas originales y repetir las métricas para estudiar su sensibilidad a esa normalización.
+    \item \textbf{Identificación y cobertura}: los nombres no son identificadores universales; los alias y homónimos pueden causar pérdidas o atribuciones ambiguas. La coincidencia exacta de Deezer es conservadora, pero no resuelve por sí sola la desambiguación. Los huecos de cobertura pueden estar relacionados con el tipo de artista.
+    \item \textbf{Afinidad}: la señal procede de vecinos de Last.fm, no de características acústicas observadas. Los candidatos se seleccionan a partir de los favoritos y los no escuchados no son ejemplos de rechazo. La comprobación \emph{leave-one-out} no constituye validación predictiva independiente. Antes de desplegar recomendaciones haría falta recoger valoraciones explícitas y evaluar candidatos nuevos con un diseño separado.
+    \item \textbf{Agrupamiento}: K-Means sobre etiquetas binarias y un filtro de soporte produce una partición exploratoria; sería necesario estudiar estabilidad, sensibilidad a sinónimos y métricas alternativas antes de atribuirle un significado general.
 \end{itemize}

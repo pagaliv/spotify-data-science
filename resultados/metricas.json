@@ -1,0 +1,547 @@
+{
+  "meta": {
+    "fecha_ejecucion": "2026-11-04",
+    "usuarios": [
+      "jorge",
+      "pablo"
+    ],
+    "n_filas": 298,
+    "n_artistas_unicos": 140
+  },
+  "validacion": [
+    {
+      "usuario": "jorge",
+      "rango": "ultimas_4_semanas",
+      "filas": 48,
+      "artistas_unicos": 48,
+      "duplicados_rango_posicion": 0,
+      "posiciones_fuera_de_rango": 0,
+      "sin_genero": 0
+    },
+    {
+      "usuario": "jorge",
+      "rango": "ultimos_6_meses",
+      "filas": 50,
+      "artistas_unicos": 50,
+      "duplicados_rango_posicion": 0,
+      "posiciones_fuera_de_rango": 0,
+      "sin_genero": 1
+    },
+    {
+      "usuario": "jorge",
+      "rango": "varios_anios",
+      "filas": 50,
+      "artistas_unicos": 50,
+      "duplicados_rango_posicion": 0,
+      "posiciones_fuera_de_rango": 0,
+      "sin_genero": 1
+    },
+    {
+      "usuario": "pablo",
+      "rango": "ultimas_4_semanas",
+      "filas": 50,
+      "artistas_unicos": 50,
+      "duplicados_rango_posicion": 0,
+      "posiciones_fuera_de_rango": 0,
+      "sin_genero": 3
+    },
+    {
+      "usuario": "pablo",
+      "rango": "ultimos_6_meses",
+      "filas": 50,
+      "artistas_unicos": 50,
+      "duplicados_rango_posicion": 0,
+      "posiciones_fuera_de_rango": 0,
+      "sin_genero": 1
+    },
+    {
+      "usuario": "pablo",
+      "rango": "varios_anios",
+      "filas": 50,
+      "artistas_unicos": 50,
+      "duplicados_rango_posicion": 0,
+      "posiciones_fuera_de_rango": 0,
+      "sin_genero": 0
+    }
+  ],
+  "resumen": [
+    {
+      "usuario": "jorge",
+      "rango": "ultimas_4_semanas",
+      "n_artistas": 48,
+      "n_con_genero": 48,
+      "pct_con_genero": 100.0,
+      "n_generos": 64,
+      "genero_top": "rock"
+    },
+    {
+      "usuario": "jorge",
+      "rango": "ultimos_6_meses",
+      "n_artistas": 50,
+      "n_con_genero": 49,
+      "pct_con_genero": 98.0,
+      "n_generos": 64,
+      "genero_top": "rock"
+    },
+    {
+      "usuario": "jorge",
+      "rango": "varios_anios",
+      "n_artistas": 50,
+      "n_con_genero": 49,
+      "pct_con_genero": 98.0,
+      "n_generos": 66,
+      "genero_top": "rock"
+    },
+    {
+      "usuario": "pablo",
+      "rango": "ultimas_4_semanas",
+      "n_artistas": 50,
+      "n_con_genero": 47,
+      "pct_con_genero": 94.0,
+      "n_generos": 57,
+      "genero_top": "rap"
+    },
+    {
+      "usuario": "pablo",
+      "rango": "ultimos_6_meses",
+      "n_artistas": 50,
+      "n_con_genero": 49,
+      "pct_con_genero": 98.0,
+      "n_generos": 60,
+      "genero_top": "rap"
+    },
+    {
+      "usuario": "pablo",
+      "rango": "varios_anios",
+      "n_artistas": 50,
+      "n_con_genero": 50,
+      "pct_con_genero": 100.0,
+      "n_generos": 56,
+      "genero_top": "rap"
+    }
+  ],
+  "diversidad": [
+    {
+      "usuario": "jorge",
+      "rango": "ultimas_4_semanas",
+      "n_artistas_con_genero": 48,
+      "n_generos": 64,
+      "entropia": 5.4033,
+      "cuota_genero_top": 0.1
+    },
+    {
+      "usuario": "jorge",
+      "rango": "ultimos_6_meses",
+      "n_artistas_con_genero": 49,
+      "n_generos": 64,
+      "entropia": 5.3244,
+      "cuota_genero_top": 0.1019
+    },
+    {
+      "usuario": "jorge",
+      "rango": "varios_anios",
+      "n_artistas_con_genero": 49,
+      "n_generos": 66,
+      "entropia": 5.3752,
+      "cuota_genero_top": 0.0943
+    },
+    {
+      "usuario": "pablo",
+      "rango": "ultimas_4_semanas",
+      "n_artistas_con_genero": 47,
+      "n_generos": 57,
+      "entropia": 5.1208,
+      "cuota_genero_top": 0.1214
+    },
+    {
+      "usuario": "pablo",
+      "rango": "ultimos_6_meses",
+      "n_artistas_con_genero": 49,
+      "n_generos": 60,
+      "entropia": 5.1231,
+      "cuota_genero_top": 0.1346
+    },
+    {
+      "usuario": "pablo",
+      "rango": "varios_anios",
+      "n_artistas_con_genero": 50,
+      "n_generos": 56,
+      "entropia": 5.0982,
+      "cuota_genero_top": 0.1274
+    }
+  ],
+  "estabilidad": [
+    {
+      "usuario": "jorge",
+      "rango_a": "ultimas_4_semanas",
+      "rango_b": "ultimos_6_meses",
+      "jaccard_artistas": 0.5806,
+      "coseno_generos": 0.963,
+      "n_comun_artistas": 36
+    },
+    {
+      "usuario": "jorge",
+      "rango_a": "ultimas_4_semanas",
+      "rango_b": "varios_anios",
+      "jaccard_artistas": 0.5312,
+      "coseno_generos": 0.9566,
+      "n_comun_artistas": 34
+    },
+    {
+      "usuario": "jorge",
+      "rango_a": "ultimos_6_meses",
+      "rango_b": "varios_anios",
+      "jaccard_artistas": 0.6129,
+      "coseno_generos": 0.9777,
+      "n_comun_artistas": 38
+    },
+    {
+      "usuario": "pablo",
+      "rango_a": "ultimas_4_semanas",
+      "rango_b": "ultimos_6_meses",
+      "jaccard_artistas": 0.5625,
+      "coseno_generos": 0.9567,
+      "n_comun_artistas": 36
+    },
+    {
+      "usuario": "pablo",
+      "rango_a": "ultimas_4_semanas",
+      "rango_b": "varios_anios",
+      "jaccard_artistas": 0.5152,
+      "coseno_generos": 0.9471,
+      "n_comun_artistas": 34
+    },
+    {
+      "usuario": "pablo",
+      "rango_a": "ultimos_6_meses",
+      "rango_b": "varios_anios",
+      "jaccard_artistas": 0.6667,
+      "coseno_generos": 0.9717,
+      "n_comun_artistas": 40
+    }
+  ],
+  "presencia_rangos": [
+    {
+      "usuario": "jorge",
+      "1": 25,
+      "2": 15,
+      "3": 31
+    },
+    {
+      "usuario": "pablo",
+      "1": 32,
+      "2": 8,
+      "3": 34
+    }
+  ],
+  "compatibilidad": [
+    {
+      "rango": "ultimas_4_semanas",
+      "jaccard_artistas": 0.0316,
+      "coseno_generos": 0.3247,
+      "n_comun_artistas": 3,
+      "n_comun_generos": 20
+    },
+    {
+      "rango": "ultimos_6_meses",
+      "jaccard_artistas": 0.0417,
+      "coseno_generos": 0.311,
+      "n_comun_artistas": 4,
+      "n_comun_generos": 17
+    },
+    {
+      "rango": "varios_anios",
+      "jaccard_artistas": 0.0309,
+      "coseno_generos": 0.4112,
+      "n_comun_artistas": 3,
+      "n_comun_generos": 19
+    },
+    {
+      "rango": "global",
+      "jaccard_artistas": 0.0357,
+      "coseno_generos": 0.4686,
+      "n_comun_artistas": 5,
+      "n_comun_generos": 27
+    }
+  ],
+  "popularidad": [
+    {
+      "usuario": "jorge",
+      "rango": "ultimas_4_semanas",
+      "rho": 0.1845,
+      "p_valor": 0.20924,
+      "n": 48
+    },
+    {
+      "usuario": "jorge",
+      "rango": "ultimos_6_meses",
+      "rho": -0.0033,
+      "p_valor": 0.981781,
+      "n": 50
+    },
+    {
+      "usuario": "jorge",
+      "rango": "varios_anios",
+      "rho": -0.0337,
+      "p_valor": 0.816485,
+      "n": 50
+    },
+    {
+      "usuario": "pablo",
+      "rango": "ultimas_4_semanas",
+      "rho": -0.1055,
+      "p_valor": 0.465907,
+      "n": 50
+    },
+    {
+      "usuario": "pablo",
+      "rango": "ultimos_6_meses",
+      "rho": 0.2548,
+      "p_valor": 0.074097,
+      "n": 50
+    },
+    {
+      "usuario": "pablo",
+      "rango": "varios_anios",
+      "rho": 0.3275,
+      "p_valor": 0.020237,
+      "n": 50
+    }
+  ],
+  "afinidad": {
+    "cobertura": {
+      "n_candidatos": 20,
+      "n_puntuables": 20
+    },
+    "loo": [
+      {
+        "usuario": "jorge",
+        "n_ocultos": 10,
+        "n_controles": 20,
+        "mediana_ocultos": 0.1069,
+        "mediana_controles": 0.0435,
+        "u_mannwhitney": 132.0,
+        "p_valor": 0.08005642245553857
+      },
+      {
+        "usuario": "pablo",
+        "n_ocultos": 10,
+        "n_controles": 20,
+        "mediana_ocultos": 0.1647,
+        "mediana_controles": 0.0,
+        "u_mannwhitney": 177.5,
+        "p_valor": 0.00020460522026322653
+      }
+    ],
+    "top10": [
+      {
+        "candidato": "C01",
+        "jorge": 0.21746399931940172,
+        "pablo": 0.0,
+        "media": 0.10873199965970086
+      },
+      {
+        "candidato": "C02",
+        "jorge": 0.0,
+        "pablo": 0.21557115676320238,
+        "media": 0.10778557838160119
+      },
+      {
+        "candidato": "C03",
+        "jorge": 0.1864836155507971,
+        "pablo": 0.0,
+        "media": 0.09324180777539855
+      },
+      {
+        "candidato": "C04",
+        "jorge": 0.1641014207747807,
+        "pablo": 0.0,
+        "media": 0.08205071038739035
+      },
+      {
+        "candidato": "C05",
+        "jorge": 0.0,
+        "pablo": 0.15143222363581127,
+        "media": 0.07571611181790563
+      },
+      {
+        "candidato": "C06",
+        "jorge": 0.0,
+        "pablo": 0.10870200923921354,
+        "media": 0.05435100461960677
+      },
+      {
+        "candidato": "C07",
+        "jorge": 0.0,
+        "pablo": 0.09014602745454972,
+        "media": 0.04507301372727486
+      },
+      {
+        "candidato": "C08",
+        "jorge": 0.0,
+        "pablo": 0.08926420915141156,
+        "media": 0.04463210457570578
+      },
+      {
+        "candidato": "C09",
+        "jorge": 0.0,
+        "pablo": 0.08900460161869252,
+        "media": 0.04450230080934626
+      },
+      {
+        "candidato": "C10",
+        "jorge": 0.0800721450773676,
+        "pablo": 0.0,
+        "media": 0.0400360725386838
+      }
+    ]
+  },
+  "clustering": {
+    "info": {
+      "n_artistas": 133,
+      "n_generos": 52,
+      "generos_excluidos": 78,
+      "artistas_excluidos": 2,
+      "artistas_sin_genero": 5
+    },
+    "k": 2,
+    "seleccion_k": [
+      {
+        "k": 2,
+        "inercia": 267.9952380952383,
+        "silhouette": 0.15078376111418332
+      },
+      {
+        "k": 3,
+        "inercia": 241.73274478330652,
+        "silhouette": 0.15911563313156277
+      },
+      {
+        "k": 4,
+        "inercia": 220.74927248677238,
+        "silhouette": 0.13471495305278441
+      },
+      {
+        "k": 5,
+        "inercia": 212.18128165407566,
+        "silhouette": 0.12464556214063977
+      },
+      {
+        "k": 6,
+        "inercia": 198.8660429482798,
+        "silhouette": 0.16089992068031264
+      },
+      {
+        "k": 7,
+        "inercia": 191.37365894974587,
+        "silhouette": 0.164377953529048
+      },
+      {
+        "k": 8,
+        "inercia": 186.97399184899197,
+        "silhouette": 0.1657736839501661
+      }
+    ],
+    "perfiles": [
+      {
+        "cluster": 0,
+        "n_artistas": 28,
+        "generos_top": "spanish hip-hop, rap, spanish rap"
+      },
+      {
+        "cluster": 1,
+        "n_artistas": 105,
+        "generos_top": "80s, alternative, alternative metal"
+      }
+    ],
+    "usuarios": [
+      {
+        "cluster": 0,
+        "jorge": 5,
+        "pablo": 24
+      },
+      {
+        "cluster": 1,
+        "jorge": 64,
+        "pablo": 45
+      }
+    ],
+    "varianza_pca": 0.2642
+  },
+  "nulos": [
+    {
+      "columna": "generos",
+      "fuente": "Last.fm (getTopTags)",
+      "n_total": 140,
+      "n_nulos": 5,
+      "pct_nulos": 3.57
+    },
+    {
+      "columna": "listeners",
+      "fuente": "Last.fm (getInfo)",
+      "n_total": 140,
+      "n_nulos": 0,
+      "pct_nulos": 0.0
+    },
+    {
+      "columna": "playcount",
+      "fuente": "Last.fm (getInfo)",
+      "n_total": 140,
+      "n_nulos": 0,
+      "pct_nulos": 0.0
+    },
+    {
+      "columna": "mbid",
+      "fuente": "Last.fm (getInfo)",
+      "n_total": 140,
+      "n_nulos": 20,
+      "pct_nulos": 14.29
+    },
+    {
+      "columna": "n_similares",
+      "fuente": "Last.fm (getSimilar)",
+      "n_total": 140,
+      "n_nulos": 0,
+      "pct_nulos": 0.0
+    },
+    {
+      "columna": "deezer_fans",
+      "fuente": "Deezer",
+      "n_total": 140,
+      "n_nulos": 4,
+      "pct_nulos": 2.86
+    },
+    {
+      "columna": "deezer_nb_album",
+      "fuente": "Deezer",
+      "n_total": 140,
+      "n_nulos": 4,
+      "pct_nulos": 2.86
+    }
+  ],
+  "imputacion": [
+    {
+      "columna": "listeners",
+      "n_imputados": 0,
+      "pct_imputados": 0.0,
+      "mediana_global": 293905.5
+    },
+    {
+      "columna": "playcount",
+      "n_imputados": 0,
+      "pct_imputados": 0.0,
+      "mediana_global": 10195836.0
+    },
+    {
+      "columna": "deezer_fans",
+      "n_imputados": 4,
+      "pct_imputados": 2.86,
+      "mediana_global": 16042.5
+    }
+  ],
+  "deezer_vs_lastfm": {
+    "rho": 0.6830399313009874,
+    "p": 5.1901950523347736e-20,
+    "n": 136
+  }
+}

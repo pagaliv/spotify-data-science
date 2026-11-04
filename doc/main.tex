@@ -9,6 +9,8 @@
 \usepackage{geometry}
 \usepackage{xcolor}
 \usepackage{titlesec}
+\usepackage{microtype}
+\usepackage{xurl}
 \usepackage{hyperref}
 \usepackage{colortbl}
 \usepackage{longtable}
@@ -42,7 +44,7 @@
 
 % Configuración de títulos de capítulo
 % Mostrar "Capítulo N: Título" en el encabezado del capítulo
-\titleformat{\chapter}[hang]{\huge\bfseries}{Capítulo \ \thechapter:}{1em}{}
+\titleformat{\chapter}[hang]{\huge\bfseries\raggedright\hyphenpenalty=10000}{Capítulo \ \thechapter:}{1em}{}
 \titlespacing*{\chapter}{0pt}{-20pt}{20pt}
 
 % Configuración de títulos de sección
@@ -61,11 +63,12 @@
 \begin{document}
 \raggedbottom
 % ==== PORTADA ====
+\hypersetup{pageanchor=false}
 \input{./preliminares/portada}
-
+\hypersetup{pageanchor=true}
 
 % ===== ÍNDICES =====
-
+\pagenumbering{roman}
 \tableofcontents    % Índice general
 
 
@@ -82,5 +85,15 @@
 \input{./capitulos/06-conclusiones}
 
 
+
+\begin{thebibliography}{9}
+\addcontentsline{toc}{chapter}{Bibliografía}
+\bibitem{enunciado} Indicaciones sobre el trabajo de la asignatura. Técnicas de Ciencia de Datos. Documento facilitado con el proyecto, \texttt{info/trabajoFinal.pdf}.
+\bibitem{sesion1} Adrián Inés Armas. \emph{Sesión 1: Introducción}. Universidad de La Rioja. Material docente: ciclo de vida, limpieza y metodologías de proyectos.
+\bibitem{fuentes} \emph{Fuentes Públicas de Datos para Proyectos de Ciencia de Datos}. Material de la Sesión 1: clasificación de fuentes y APIs.
+\bibitem{sesion2} Adrián Inés Armas. \emph{Sesión 2: Codificación y compresión}. Universidad de La Rioja. Diapositivas 9--12: Unicode/UTF-8; compresión sin pérdida y PNG.
+\bibitem{sesion3} Adrián Inés Armas. \emph{Sesión 3: Datos, formatos y herramientas HDF5}. Universidad de La Rioja. Diapositivas 24--26: CSV y JSON; formatos para grandes volúmenes.
+\bibitem{sesion6} Adrián Inés Armas. \emph{Sesión 6: Visualización de datos}. Universidad de La Rioja. Diapositivas 4--9 y 24: audiencia, objetivo y buenas prácticas.
+\end{thebibliography}
 
 \end{document}

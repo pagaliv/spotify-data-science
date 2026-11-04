@@ -2,8 +2,7 @@
 % ===== CAPÍTULO 3: TRATAMIENTO DE LOS DATOS =====
 % ============================================
 
-\chapter*{Tratamiento de los datos}
-\addcontentsline{toc}{chapter}{3. Tratamiento de los datos}
+\chapter{Tratamiento de los datos}
 \label{chap:tratamiento}
 
 \section{Herramientas y librerías utilizadas}
@@ -14,7 +13,7 @@ El proyecto se ha desarrollado íntegramente en Python, dentro de un entorno vir
 \begin{itemize}
     \item \texttt{TrabajoTecnicasDeCienciaDeDatos.ipynb}: extracción de los artistas más escuchados y de sus géneros.
     \item \texttt{AnalisisTecnicasDeCienciaDeDatos.ipynb}: consolidación, enriquecimiento, análisis y generación de figuras.
-    \item \texttt{spotify\_analisis.py}: funciones puras reutilizables por ambos cuadernos.
+    \item \texttt{spotify\_analisis.py}: funciones reutilizables de cálculo y acceso a fuentes, utilizadas por el cuaderno de análisis.
 \end{itemize}
 
 La Tabla~\ref{tab:librerias} recoge las librerías empleadas y su función.
@@ -26,7 +25,7 @@ La Tabla~\ref{tab:librerias} recoge las librerías empleadas y su función.
         \hline
         \textbf{Librería} & \textbf{Uso en el proyecto} \\
         \hline
-        \texttt{spotipy} & Cliente de la Spotify Web API; gestiona el flujo OAuth y las peticiones a \texttt{current\_user\_top\_artists}. \\
+        \texttt{spotipy} & Cliente de la Spotify Web API; gestiona el flujo OAuth y las peticiones a \nolinkurl{current_user_top_artists}. \\
         \hline
         \texttt{requests} & Peticiones HTTP a Last.fm y Deezer, con reintentos y control de errores. \\
         \hline
@@ -54,9 +53,13 @@ La Tabla~\ref{tab:librerias} recoge las librerías empleadas y su función.
 \section{Formato de los datos}
 \label{sec:formato}
 
-Se ha optado por \textbf{CSV} (valores separados por comas) para los datos de extracción y los agregados, codificado en \texttt{utf-8-sig} para preservar correctamente los caracteres no latinos presentes en los nombres de artistas (japonés, coreano, etc.) y mantener compatibilidad con Excel. Es un formato estructurado y legible, adecuado para un volumen de decenas o cientos de filas que se procesa con \texttt{pandas}; alternativas orientadas a grandes volúmenes o datos jerárquicos, como HDF5 o Parquet, no aportan ventajas con este tamaño y dificultan la inspección manual.
+Se usa \textbf{CSV} (valores separados por comas) para la extracción y los agregados, según el formato tabular estudiado en la Sesión~3~\cite{sesion3}. Los CSV originales están codificados en \texttt{utf-8-sig}: Unicode preserva tanto los acentos como los nombres japoneses, y la marca BOM facilita el reconocimiento de la codificación en Excel. Se lee con esa codificación para que el BOM no pase a formar parte del nombre de la primera columna; los agregados se escriben en UTF-8 sin BOM. Esta decisión aplica los conceptos de repertorio, puntos de código y codificación de la Sesión~2~\cite{sesion2}, sin transliterar ni perder caracteres.
 
-La \textbf{caché de enriquecimiento} se guarda en \textbf{JSON} porque su estructura es anidada (por artista, con listas de similares) y porque permite reanudar el proceso sin repetir llamadas a las APIs. Los metadatos de la extracción y las métricas finales también se exportan en JSON, que es directamente consumible por el informe y por cualquier validación posterior.
+Con 298 registros, CSV ofrece inspección sencilla e interoperabilidad con \texttt{pandas}. No se necesitan las lecturas parciales, los grupos o los bloques de HDF5, ni la optimización columnar de Parquet descritos en la Sesión~3. La elección se justifica por la escala y la estructura, no porque dichos formatos sean inadecuados en general.
+
+La \textbf{caché de enriquecimiento} se guarda en \textbf{JSON}, formato de estructura jerárquica y listas estudiado en la Sesión~3~\cite{sesion3}. Cada artista tiene metadatos y una lista de vecinos similares. También se exportan en JSON los metadatos y las métricas; los resultados no calculables se representan como \texttt{null}, sin valores \texttt{NaN} o infinitos ajenos al estándar.
+
+Las figuras se guardan en PNG a 300~dpi. PNG emplea compresión sin pérdida, de acuerdo con la Sesión~2~\cite{sesion2}: mantiene trazos y etiquetas sin los artefactos de una compresión con pérdida como JPEG.
 
 \section{Proceso de obtención de los datos base}
 \label{sec:proceso}
@@ -65,11 +68,11 @@ El proceso implementado en el cuaderno de extracción sigue estos pasos:
 
 \begin{enumerate}
     \item \textbf{Autenticación}: se cargan las credenciales desde \texttt{.env} y se inicializa el cliente \texttt{spotipy.Spotify} con el \emph{scope} \texttt{user-top-read}. El token se cachea localmente.
-    \item \textbf{Descarga de artistas por rango}: para cada uno de los tres rangos temporales (Tabla~\ref{tab:rangos}), se solicita el \emph{top} 50 de artistas más escuchados (\texttt{current\_user\_top\_artists}) y se añade cada uno a una lista de registros con su posición, nombre y enlace de Spotify.
+    \item \textbf{Descarga de artistas por rango}: para cada uno de los tres rangos temporales (Tabla~\ref{tab:rangos}), se solicita el \emph{top} 50 de artistas más escuchados (\nolinkurl{current_user_top_artists}) y se añade cada uno a una lista de registros con su posición, nombre y enlace de Spotify.
     \item \textbf{Deduplicación antes de consultar géneros}: dado que un mismo artista puede repetirse en varios rangos, se extrae el conjunto de artistas \emph{únicos} antes de consultar Last.fm, para minimizar el número de peticiones y respetar sus límites de uso.
-    \item \textbf{Consulta de géneros en Last.fm}: para cada artista único se solicita \texttt{artist.gettoptags}, que devuelve etiquetas con un peso (\emph{count}) entre 0 y 100. Se seleccionan como máximo 4 etiquetas con peso igual o superior a 20, descartando las etiquetas no musicales recogidas en el conjunto \texttt{IGNORAR} (nacionalidades, tipo de voz, metaetiquetas).
+    \item \textbf{Consulta de géneros en Last.fm}: para cada artista único se solicita \nolinkurl{artist.gettoptags}, que devuelve etiquetas con un peso (\emph{count}) entre 0 y 100. Se seleccionan como máximo 4 etiquetas con peso igual o superior a 20, descartando las etiquetas no musicales recogidas en el conjunto \texttt{IGNORAR} (nacionalidades, tipo de voz, metaetiquetas).
     \item \textbf{Combinación}: los géneros se incorporan al \texttt{DataFrame} mediante un mapeo artista~$\rightarrow$~géneros, evitando repetir la consulta para un artista presente en varios rangos.
-    \item \textbf{Exportación}: el resultado se guarda como \texttt{top\_artistas.csv} o \texttt{top\_artistasJorge.csv} según el autor, con las columnas \texttt{rango}, \texttt{posicion}, \texttt{artista}, \texttt{generos} y \texttt{spotify\_url} (Tabla~\ref{tab:esquema}).
+    \item \textbf{Exportación}: el resultado se guarda como \texttt{top\_artistas.csv} o \nolinkurl{top_artistasJorge.csv} según el autor, con las columnas \texttt{rango}, \texttt{posicion}, \texttt{artista}, \texttt{generos} y \texttt{spotify\_url} (Tabla~\ref{tab:esquema}).
 \end{enumerate}
 
 \section{Proceso de enriquecimiento}
@@ -83,7 +86,9 @@ Sobre el conjunto de artistas únicos de ambos autores, el cuaderno de análisis
     \item \textbf{Deezer}: búsqueda pública del artista para obtener fans y número de álbumes.
 \end{enumerate}
 
-Las respuestas se guardan en \texttt{cache/enriquecimiento.json} con una clave por artista y fuente. Antes de cada llamada se comprueba la caché, de modo que una segunda ejecución no repite peticiones. Se aplica una pausa de 0,25~s en Last.fm y 0,1~s en Deezer, y se reintenta con espera creciente ante errores 429 o 5xx. Los artistas no encontrados se almacenan con valores nulos y la bandera \texttt{fuente\_encontrada=False} para no reintentarlos indefinidamente. La URL de las peticiones, que contiene la \emph{API key}, nunca se escribe en los registros.
+Las respuestas válidas se guardan en \texttt{cache/enriquecimiento.json} con una clave por artista y consulta. Antes de cada llamada se comprueba la caché. Se pausa 0,25~s en Last.fm y 0,1~s en Deezer, con hasta tres intentos y espera creciente ante fallos temporales HTTP o de la API. Una ausencia válida se conserva como nulos o lista vacía; un fallo persistente detiene la ejecución con un mensaje sin credenciales y no se registra como ausencia definitiva.
+
+En Deezer solo se aceptan coincidencias de nombre ignorando mayúsculas y espacios exteriores; no se atribuyen los fans del primer resultado aproximado a un artista distinto. Esta regla conservadora puede reducir la cobertura por diferencias de alias. Tras seleccionar candidatos nuevos, se consulta además \texttt{artist.getSimilar} para esos candidatos, sin volver a expandir su vecindad ni solicitarles otros metadatos.
 
 \section{Privacidad y reproducibilidad}
 \label{sec:privacidad}
@@ -92,10 +97,10 @@ Los datos de partida son personales: identifican los gustos musicales de los dos
 
 \begin{itemize}
     \item Los CSV crudos (\texttt{top\_artistas*.csv}), el fichero \texttt{.env}, la caché de tokens (\texttt{.cache}) y la caché de enriquecimiento no se versionan; están excluidos en \texttt{.gitignore}.
-    \item Solo se publican agregados sin nombres de artistas (\texttt{resultados/*.csv} y \texttt{resultados/metricas.json}) y las figuras, que tampoco etiquetan artistas individuales salvo en los análisis agregados.
+    \item Solo se versionan tablas agregadas y las métricas (\nolinkurl{resultados/metricas.json}), junto con las figuras del informe, sin nombres de artistas individuales. Las tablas identificativas se mantienen fuera del repositorio.
     \item Cada autor ejecuta la extracción con su propia cuenta; el token de acceso es intransferible aunque las credenciales de la aplicación se compartan.
-    \item La extracción de ambos autores se realiza el mismo día y la fecha se registra en \texttt{resultados/extraccion\_meta.json} para acotar la deriva temporal.
-    \item La semilla de los procesos aleatorios es fija ($42$) y los parámetros relevantes (número de similares, soporte mínimo de género, mínimo de artistas por grupo para imputar y rango de $k$) están definidos como constantes del módulo.
+    \item Los metadatos diferencian la fecha de extracción acreditada de la de análisis. La fecha original de Jorge permanece desconocida; no se sustituye por la fecha de modificación del archivo.
+    \item La semilla de los procesos aleatorios es fija ($42$) y los parámetros relevantes (número de similares, soporte mínimo de género, mínimo de artistas por grupo para imputar y rango de $k$) están explícitos como constantes o valores predeterminados del módulo.
 \end{itemize}
 
 \section{Decisiones de diseño}

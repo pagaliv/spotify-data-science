@@ -1,0 +1,7 @@
+usuario,rango_a,rango_b,jaccard_artistas,coseno_generos,n_comun_artistas
+jorge,ultimas_4_semanas,ultimos_6_meses,0.5806,0.963,36
+jorge,ultimas_4_semanas,varios_anios,0.5312,0.9566,34
+jorge,ultimos_6_meses,varios_anios,0.6129,0.9777,38
+pablo,ultimas_4_semanas,ultimos_6_meses,0.5625,0.9567,36
+pablo,ultimas_4_semanas,varios_anios,0.5152,0.9471,34
+pablo,ultimos_6_meses,varios_anios,0.6667,0.9717,40

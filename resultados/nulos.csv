@@ -1,0 +1,8 @@
+columna,fuente,n_total,n_nulos,pct_nulos
+generos,Last.fm (getTopTags),140,5,3.57
+listeners,Last.fm (getInfo),140,0,0.0
+playcount,Last.fm (getInfo),140,0,0.0
+mbid,Last.fm (getInfo),140,20,14.29
+n_similares,Last.fm (getSimilar),140,0,0.0
+deezer_fans,Deezer,140,4,2.86
+deezer_nb_album,Deezer,140,4,2.86

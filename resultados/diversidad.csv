@@ -1,0 +1,7 @@
+usuario,rango,n_artistas_con_genero,n_generos,entropia,cuota_genero_top
+jorge,ultimas_4_semanas,48,64,5.4033,0.1
+jorge,ultimos_6_meses,49,64,5.3244,0.1019
+jorge,varios_anios,49,66,5.3752,0.0943
+pablo,ultimas_4_semanas,47,57,5.1208,0.1214
+pablo,ultimos_6_meses,49,60,5.1231,0.1346
+pablo,varios_anios,50,56,5.0982,0.1274

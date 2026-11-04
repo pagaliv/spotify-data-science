@@ -2,11 +2,10 @@
 % ===== CAPÍTULO 4: DISEÑO DEL MODELO DE DATOS =====
 % ============================================
 
-\chapter*{Diseño del modelo de datos}
-\addcontentsline{toc}{chapter}{4. Diseño del modelo de datos}
+\chapter{Diseño del modelo de datos}
 \label{chap:modelo}
 
-Este capítulo describe el modelo de datos construido para el análisis y las decisiones de tratamiento que lo acompañan. Todas las transformaciones están implementadas como funciones puras en el módulo \texttt{spotify\_analisis.py}, de modo que el cuaderno \texttt{AnalisisTecnicasDeCienciaDeDatos.ipynb} se limita a orquestarlas y a presentar los resultados. La separación entre lógica y presentación permite reproducir el análisis completo con un único \emph{Restart \& Run All} y reutilizar las mismas funciones con los datos de cualquier otro usuario.
+Este capítulo describe el modelo de datos construido para el análisis y las decisiones de tratamiento que lo acompañan. Los cálculos y las consultas externas están implementados como funciones en el módulo \texttt{spotify\_analisis.py}, de modo que el cuaderno \texttt{AnalisisTecnicasDeCienciaDeDatos.ipynb} se limita a orquestarlas y a presentar los resultados. La separación entre lógica y presentación permite reproducir el análisis completo con un único \emph{Restart \& Run All} y reutilizar las mismas funciones con los datos de cualquier otro usuario.
 
 \section{Estructura de partida y consolidación}
 \label{sec:estructura-partida}
@@ -15,7 +14,7 @@ El conjunto de datos de partida (Capítulo~\ref{chap:datos}) está en \textbf{fo
 
 \begin{itemize}
     \item \textbf{Tabla larga consolidada}: unión de los CSV de ambos autores con las columnas originales más \texttt{usuario} y \texttt{rango\_orden} (1 = últimas 4 semanas, 2 = últimos 6 meses, 3 = varios años). La posición se convierte a entero y la columna \texttt{generos} se normaliza a cadena vacía cuando falta.
-    \item \textbf{Tabla artista--género}: una fila por cada género individual de cada artista, separando la cadena \texttt{generos} por \texttt{;}. Los géneros se normalizan a minúsculas y se deduplican dentro de cada artista, de forma que un artista que aparezca en varios rangos no infla el recuento.
+    \item \textbf{Tabla larga de etiquetas}: una fila por usuario, rango, artista y etiqueta, separando \texttt{generos} por \texttt{;}. Se normalizan las etiquetas a minúsculas. Para construir un perfil global se deduplica artista--etiqueta; para comparar rangos se conserva la pertenencia al rango. La matriz binaria de agrupamiento usa una única fila por artista.
     \item \textbf{Resumen por usuario y rango}: número de artistas distintos, artistas con al menos un género, porcentaje de cobertura y número de géneros distintos.
     \item \textbf{Tabla combinada}: permite comparar directamente los perfiles de ambos autores, que es la base de la compatibilidad del \S\ref{sec:compatibilidad}.
 \end{itemize}
@@ -35,7 +34,7 @@ La Tabla~\ref{tab:tablas-derivadas} resume el grano y el uso de cada tabla deriv
         \hline
         \texttt{artista\_genero} & artista $\times$ género & Frecuencias de género y matriz binaria para el agrupamiento \\
         \hline
-        \texttt{perfil\_usuario\_rango} & usuario $\times$ rango & Cobertura y diversidad por rango \\
+        \nolinkurl{perfil_usuario_rango} & usuario $\times$ rango & Cobertura y diversidad por rango \\
         \hline
         \texttt{artistas} & artista único & Atributos enriquecidos y banderas de imputación \\
         \hline
@@ -66,14 +65,14 @@ El modelo no se limita a los géneros: cada artista único se enriquece con atri
         \hline
         \texttt{listeners}, \texttt{playcount}, \texttt{mbid} & Last.fm (\texttt{artist.getInfo}) & Popularidad general del artista \\
         \hline
-        \texttt{similar\_top}, \texttt{match\_top}, \texttt{n\_similares} & Last.fm (\texttt{artist.getSimilar}) & Vecindad de similitud para la afinidad \\
+        \texttt{similar\_top}, \texttt{match\_top}, \texttt{n\_similares} & Last.fm (\nolinkurl{artist.getSimilar}) & Vecindad de similitud para la afinidad \\
         \hline
         \texttt{deezer\_fans}, \texttt{deezer\_nb\_album} & Deezer (búsqueda pública) & Contraste de popularidad y generación de nulos reales \\
         \hline
     \end{tabular}
 \end{table}
 
-Las consultas se realizan una sola vez por artista y se guardan en una caché JSON local (\texttt{cache/enriquecimiento.json}), de modo que una segunda ejecución no repite llamadas. Se aplica una pausa entre peticiones y reintentos con espera creciente ante errores temporales o límites de frecuencia. Los artistas no encontrados se registran con valores nulos y la bandera correspondiente, en lugar de reintentarse indefinidamente.
+Las consultas se realizan una sola vez por artista y se guardan en una caché JSON local (\texttt{cache/enriquecimiento.json}), de modo que una segunda ejecución no repite llamadas. Se aplica una pausa entre peticiones y reintentos con espera creciente ante errores temporales o límites de frecuencia. Las respuestas válidas sin información se registran con valores nulos o listas vacías; los fallos persistentes de la fuente se distinguen de esas ausencias y no se cachean como resultados válidos.
 
 Se evaluó también \textbf{MusicBrainz} como fuente de metadatos canónicos (país, año de actividad, identificadores). Se descartó porque, sin un mapa geográfico en el alcance del proyecto, no aportaba variables que mejorasen las preguntas planteadas y añadía una consulta adicional por artista.
 
@@ -90,7 +89,7 @@ Los nulos aparecen en dos niveles: géneros vacíos en el CSV de extracción y a
     \item \textbf{Correlaciones de popularidad}: se calculan sobre casos completos, nunca sobre valores imputados, para no inflar artificialmente la correlación.
 \end{itemize}
 
-La Figura~\ref{fig:nulos} muestra la cobertura resultante y la Tabla~\ref{tab:nulos-reglas} resume las reglas aplicadas.
+La Figura~\ref{fig:nulos} muestra las ausencias sobre los 140 artistas únicos y la Tabla~\ref{tab:nulos-reglas} resume las reglas aplicadas. En \texttt{n\_similares} se cuenta expresamente el valor cero como ausencia de vecinos, aunque cero sea un recuento válido y no un nulo de almacenamiento. La imputación es una demostración de tratamiento, acorde con la limpieza descrita en la Sesión~1~\cite{sesion1}; no se utiliza para fabricar señal en los contrastes. El género principal se elige por frecuencia, con desempate alfabético, por lo que no equivale necesariamente a la etiqueta más representativa según Last.fm.
 
 \begin{table}[H]
     \centering
@@ -143,12 +142,12 @@ que vale 1 cuando los conjuntos coinciden y 0 cuando son disjuntos. Para los gé
 \[
 \cos(\mathbf{u},\mathbf{v}) = \frac{\mathbf{u}\cdot\mathbf{v}}{\|\mathbf{u}\|\,\|\mathbf{v}\|}.
 \]
-Ambas métricas se calculan para cada par de rangos (estabilidad) y entre usuarios (compatibilidad), incluyendo una fila global que agrega los tres rangos. El resultado se interpreta de forma descriptiva: con dos usuarios no se plantea contraste de hipótesis ni generalización poblacional.
+Ambas métricas se calculan para cada par de rangos (estabilidad) y entre usuarios (compatibilidad), incluyendo una fila global con artistas únicos de los tres rangos. Para Jaccard se usa la tabla original completa, incluidos los artistas sin etiquetas; para el coseno se usa la tabla de géneros. Así, la falta de etiquetas no altera los conjuntos de artistas. El resultado es descriptivo y no se generaliza a una población.
 
 \subsection{Afinidad usuario--artista}
 \label{sec:recomendacion}
 
-No existe una fuente fiable de ejemplos negativos (Spotify no expone artistas bloqueados u ocultados), por lo que se descarta un clasificador supervisado y se opta por un enfoque de \textbf{similitud de contenido}. Para cada usuario $u$ se define el peso de un artista $a$ de su historial como
+No existe una fuente fiable de ejemplos negativos (Spotify no expone artistas bloqueados u ocultados), por lo que se descarta un clasificador supervisado y se opta por una \textbf{heurística de vecindad entre artistas} basada en la similitud publicada por Last.fm. No se entrena un modelo propio de contenido acústico ni se considera que esa similitud externa sea una preferencia observada del usuario. Para cada usuario $u$ se define el peso de un artista $a$ de su historial como
 \[
 w_u(a) = \frac{51 - \min_r \text{posición}_r(a)}{50},
 \]
@@ -156,24 +155,26 @@ de modo que el primer puesto de cualquier rango pesa aproximadamente 1 y el pues
 \[
 S(c,u) = \frac{\sum_{s \in \mathrm{Sim}(c)} \mathrm{match}(c,s)\, w_u(s)}{\sum_{s \in \mathrm{Sim}(c)} \mathrm{match}(c,s)}.
 \]
-La puntuación es nula si el artista no tiene vecinos. Los candidatos se generan a partir de los diez artistas mejor situados de cada usuario, se excluyen los que ya aparecen en cualquier historial y se conservan los veinte con mayor similitud media.
+Si el artista no tiene vecinos o la suma de sus pesos es cero, la puntuación se considera \textbf{no calculable}, no igual a cero. En cambio, si hay vecinos pero ninguno aparece en el ranking del usuario, el resultado sí es cero. Los candidatos se generan a partir de los diez artistas mejor situados de cada usuario, excluyendo los presentes en cualquiera de los rankings y conservando hasta veinte con mayor similitud media. A continuación se consultan los vecinos propios de cada candidato, necesarios para evaluar la fórmula. La media entre usuarios se calcula solo si ambas puntuaciones están disponibles; los no calculables no entran en el top mostrado.
 
-Como comprobación descriptiva se aplica un esquema \emph{leave-one-out}: se oculta cada artista del top-10, se recalcula su puntuación sin él y se compara con la de los candidatos-control mediante medianas y la prueba U de Mann-Whitney. No es una evaluación supervisada ni una medida de acierto predictivo; solo indica si la señal ordena razonablemente los artistas conocidos por encima de los ajenos.
+La puntuación no es una probabilidad de que guste un artista ni el porcentaje de escucha esperado. La selección favorece candidatos relacionados con los artistas de partida, por lo que su distribución no representa un conjunto aleatorio de artistas desconocidos.
+
+Como comprobación descriptiva se aplica un esquema \emph{leave-one-out}: se oculta cada artista del top-10, se recalcula su puntuación sin él y se compara con la de los candidatos-control mediante medianas y la prueba U de Mann-Whitney. No es una evaluación supervisada ni una medida de acierto predictivo. Los candidatos no son ejemplos negativos y su selección no es independiente de los favoritos; por ello el estadístico y su valor p se conservan como comprobación exploratoria, sin convertirlos en una garantía de recomendación o en evidencia confirmatoria.
 
 \subsection{Agrupamiento de artistas}
 \label{sec:clustering}
 
-Cada artista se representa por un vector binario de géneros (1 si el artista tiene ese género). Se conservan los géneros presentes en al menos dos artistas y los artistas con al menos un género; las exclusiones se documentan. Sobre esa matriz se aplica K-Means con semilla fija ($42$) y diez inicializaciones. El número de grupos se elige en el rango $k \in [2,8]$ combinando el método del codo (inercia) y el coeficiente de silueta, prefiriendo el $k$ menor cuando las diferencias de silueta son inferiores a 0,02. Los grupos se etiquetan por los tres géneros con mayor prevalencia relativa y se proyectan en dos dimensiones mediante PCA, que es solo una ayuda visual: el agrupamiento se realiza en el espacio completo de géneros.
+Cada artista se representa por un vector binario de géneros (1 si el artista tiene ese género). Se conservan los géneros presentes en al menos dos artistas y los artistas con al menos un género; las exclusiones se documentan. Sobre esa matriz se aplica K-Means con semilla fija ($42$) y diez inicializaciones. Se examinan la inercia y el coeficiente de silueta para $k \in [2,8]$. La regla automática elige el menor $k$ cuya silueta está a una distancia máxima de 0,02 del mejor valor observado; la inercia se presenta como diagnóstico complementario, no interviene en esa regla. Los grupos se etiquetan por las tres etiquetas con mayor cociente entre prevalencia interna y global (\emph{lift}) y se proyectan en dos dimensiones mediante PCA, que es solo una ayuda visual: el agrupamiento se realiza en el espacio completo de géneros.
 
 \section{Decisiones de implementación y reproducibilidad}
 \label{sec:reproducibilidad-modelo}
 
 \begin{itemize}
     \item \textbf{Semilla fija} ($42$) en K-Means y en cualquier proceso aleatorio.
-    \item \textbf{Caché persistente} de enriquecimiento para evitar llamadas repetidas y garantizar que dos ejecuciones producen los mismos datos.
+    \item \textbf{Caché persistente} de respuestas válidas para repetir el análisis sobre la misma instantánea de metadatos, sin garantizar que una extracción nueva de las APIs produzca los mismos valores.
     \item \textbf{Credenciales fuera del repositorio}: el fichero \texttt{.env} y la caché de tokens no se versionan; los CSV con nombres de artistas tampoco.
     \item \textbf{Salidas separadas}: las tablas con nombres de artistas quedan en local y solo se publican agregados y figuras sin etiquetas identificativas.
-    \item \textbf{Parámetros explícitos}: número de similares (20), mínimo de soporte de género (2), mínimo de artistas por grupo para imputar (5) y rango de $k$ (2--8) están definidos como constantes del módulo.
+    \item \textbf{Parámetros explícitos}: número de similares (20), mínimo de soporte de género (2), mínimo de artistas por grupo para imputar (5) y rango de $k$ (2--8) están explícitos como constantes o valores predeterminados del módulo.
 \end{itemize}
 
 \section{Limitaciones del modelo}
@@ -182,7 +183,7 @@ Cada artista se representa por un vector binario de géneros (1 si el artista ti
 \begin{itemize}
     \item \textbf{Dos usuarios}: los índices de compatibilidad describen a estos dos autores, no a una población.
     \item \textbf{Etiquetas de género colaborativas}: Last.fm es una folksonomía; las etiquetas pueden ser ruidosas, redundantes o mezclar género con país o época.
-    \item \textbf{Datos dinámicos}: el top de Spotify cambia con el tiempo; ambos CSV deben extraerse el mismo día y la fecha se registra con los metadatos.
+    \item \textbf{Datos dinámicos}: el top de Spotify cambia con el tiempo. Sería preferible acreditar extracciones simultáneas, pero solo se dispone de la fecha original de Pablo; la de Jorge se mantiene desconocida.
     \item \textbf{Cobertura desigual}: los artistas de nicho tienen menos probabilidades de estar en Last.fm o Deezer, lo que puede sesgar las comparaciones de popularidad.
     \item \textbf{Sin características de audio}: la retirada de \texttt{audio-features} impide usar \emph{danceability}, \emph{energy} u otras variables acústicas.
 \end{itemize}

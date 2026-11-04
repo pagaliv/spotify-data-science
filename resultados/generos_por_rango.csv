@@ -1,0 +1,368 @@
+usuario,rango,genero,n_asociaciones
+jorge,ultimas_4_semanas,70s,1
+jorge,ultimas_4_semanas,80s,2
+jorge,ultimas_4_semanas,acid jazz,1
+jorge,ultimas_4_semanas,alternative,10
+jorge,ultimas_4_semanas,alternative metal,2
+jorge,ultimas_4_semanas,alternative rock,7
+jorge,ultimas_4_semanas,ballad,1
+jorge,ultimas_4_semanas,blues,1
+jorge,ultimas_4_semanas,blues rock,1
+jorge,ultimas_4_semanas,chiptune,1
+jorge,ultimas_4_semanas,city pop,1
+jorge,ultimas_4_semanas,classic rock,2
+jorge,ultimas_4_semanas,composer,1
+jorge,ultimas_4_semanas,dance,1
+jorge,ultimas_4_semanas,deathcore,1
+jorge,ultimas_4_semanas,disco,1
+jorge,ultimas_4_semanas,dubstep,1
+jorge,ultimas_4_semanas,electronic,7
+jorge,ultimas_4_semanas,emo,1
+jorge,ultimas_4_semanas,flamenco,1
+jorge,ultimas_4_semanas,hard rock,5
+jorge,ultimas_4_semanas,hardcore,2
+jorge,ultimas_4_semanas,heavy metal,3
+jorge,ultimas_4_semanas,hip hop,1
+jorge,ultimas_4_semanas,hip-hop,3
+jorge,ultimas_4_semanas,house,1
+jorge,ultimas_4_semanas,indie,3
+jorge,ultimas_4_semanas,indie rock,3
+jorge,ultimas_4_semanas,instrumental,1
+jorge,ultimas_4_semanas,j-pop,3
+jorge,ultimas_4_semanas,japanese,7
+jorge,ultimas_4_semanas,jazz,1
+jorge,ultimas_4_semanas,k-pop,1
+jorge,ultimas_4_semanas,korean,1
+jorge,ultimas_4_semanas,mathcore,1
+jorge,ultimas_4_semanas,melty blood,1
+jorge,ultimas_4_semanas,metal,6
+jorge,ultimas_4_semanas,metalcore,4
+jorge,ultimas_4_semanas,modern rock,1
+jorge,ultimas_4_semanas,new flamenco,1
+jorge,ultimas_4_semanas,nu metal,6
+jorge,ultimas_4_semanas,pop,6
+jorge,ultimas_4_semanas,pop punk,1
+jorge,ultimas_4_semanas,pop rock,1
+jorge,ultimas_4_semanas,post-hardcore,2
+jorge,ultimas_4_semanas,power metal,1
+jorge,ultimas_4_semanas,progressive rock,1
+jorge,ultimas_4_semanas,psychedelic,1
+jorge,ultimas_4_semanas,psychedelic rock,1
+jorge,ultimas_4_semanas,punk,1
+jorge,ultimas_4_semanas,punk rock,2
+jorge,ultimas_4_semanas,rap,3
+jorge,ultimas_4_semanas,rapcore,1
+jorge,ultimas_4_semanas,reggaeton,1
+jorge,ultimas_4_semanas,rnb,2
+jorge,ultimas_4_semanas,rock,16
+jorge,ultimas_4_semanas,screamo,2
+jorge,ultimas_4_semanas,sonic,1
+jorge,ultimas_4_semanas,soul,1
+jorge,ultimas_4_semanas,soundtrack,9
+jorge,ultimas_4_semanas,spanish rock,1
+jorge,ultimas_4_semanas,techno,1
+jorge,ultimas_4_semanas,trip-hop,1
+jorge,ultimas_4_semanas,video game music,5
+jorge,ultimos_6_meses,70s,1
+jorge,ultimos_6_meses,acid jazz,1
+jorge,ultimos_6_meses,alternative,12
+jorge,ultimos_6_meses,alternative metal,2
+jorge,ultimos_6_meses,alternative rock,5
+jorge,ultimos_6_meses,ballad,1
+jorge,ultimos_6_meses,blues,1
+jorge,ultimos_6_meses,blues rock,1
+jorge,ultimos_6_meses,chiptune,1
+jorge,ultimos_6_meses,classic rock,1
+jorge,ultimos_6_meses,dance,1
+jorge,ultimos_6_meses,deathcore,1
+jorge,ultimos_6_meses,disco,1
+jorge,ultimos_6_meses,dubstep,1
+jorge,ultimos_6_meses,electronic,9
+jorge,ultimos_6_meses,emo,1
+jorge,ultimos_6_meses,experimental,1
+jorge,ultimos_6_meses,flamenco,1
+jorge,ultimos_6_meses,funk rock,1
+jorge,ultimos_6_meses,hard rock,2
+jorge,ultimos_6_meses,hardcore,2
+jorge,ultimos_6_meses,heavy metal,3
+jorge,ultimos_6_meses,hip hop,1
+jorge,ultimos_6_meses,hip-hop,3
+jorge,ultimos_6_meses,house,1
+jorge,ultimos_6_meses,indie,5
+jorge,ultimos_6_meses,indie rock,3
+jorge,ultimos_6_meses,instrumental,1
+jorge,ultimos_6_meses,j-pop,2
+jorge,ultimos_6_meses,japanese,7
+jorge,ultimos_6_meses,k-pop,1
+jorge,ultimos_6_meses,korean,1
+jorge,ultimos_6_meses,lo-fi,1
+jorge,ultimos_6_meses,mathcore,1
+jorge,ultimos_6_meses,melty blood,1
+jorge,ultimos_6_meses,metal,4
+jorge,ultimos_6_meses,metalcore,3
+jorge,ultimos_6_meses,new flamenco,1
+jorge,ultimos_6_meses,nu metal,5
+jorge,ultimos_6_meses,pop,5
+jorge,ultimos_6_meses,pop punk,2
+jorge,ultimos_6_meses,pop rock,1
+jorge,ultimos_6_meses,post-hardcore,1
+jorge,ultimos_6_meses,post-punk,1
+jorge,ultimos_6_meses,power metal,1
+jorge,ultimos_6_meses,powerpop,1
+jorge,ultimos_6_meses,progressive metal,1
+jorge,ultimos_6_meses,progressive rock,1
+jorge,ultimos_6_meses,psychedelic,1
+jorge,ultimos_6_meses,psychedelic rock,1
+jorge,ultimos_6_meses,punk,2
+jorge,ultimos_6_meses,punk rock,2
+jorge,ultimos_6_meses,rap,2
+jorge,ultimos_6_meses,rapcore,1
+jorge,ultimos_6_meses,rnb,1
+jorge,ultimos_6_meses,rock,16
+jorge,ultimos_6_meses,screamo,2
+jorge,ultimos_6_meses,soul,1
+jorge,ultimos_6_meses,soundtrack,12
+jorge,ultimos_6_meses,spanish rock,1
+jorge,ultimos_6_meses,techno,1
+jorge,ultimos_6_meses,thrash metal,1
+jorge,ultimos_6_meses,trip-hop,1
+jorge,ultimos_6_meses,video game music,7
+jorge,varios_anios,70s,1
+jorge,varios_anios,acid jazz,1
+jorge,varios_anios,alternative,12
+jorge,varios_anios,alternative metal,2
+jorge,varios_anios,alternative rock,4
+jorge,varios_anios,ambient,1
+jorge,varios_anios,asian,1
+jorge,varios_anios,ballad,1
+jorge,varios_anios,blues,1
+jorge,varios_anios,blues rock,1
+jorge,varios_anios,chiptune,1
+jorge,varios_anios,christian,1
+jorge,varios_anios,cinematic classical,1
+jorge,varios_anios,classical,1
+jorge,varios_anios,dance,1
+jorge,varios_anios,deathcore,1
+jorge,varios_anios,disco,1
+jorge,varios_anios,dubstep,1
+jorge,varios_anios,electronic,8
+jorge,varios_anios,emo,1
+jorge,varios_anios,flamenco,1
+jorge,varios_anios,future funk,1
+jorge,varios_anios,hard rock,2
+jorge,varios_anios,hardcore,2
+jorge,varios_anios,heavy metal,2
+jorge,varios_anios,hip hop,2
+jorge,varios_anios,hip-hop,4
+jorge,varios_anios,house,1
+jorge,varios_anios,indie,4
+jorge,varios_anios,indie rock,5
+jorge,varios_anios,instrumental,1
+jorge,varios_anios,j-pop,2
+jorge,varios_anios,japanese,9
+jorge,varios_anios,k-pop,1
+jorge,varios_anios,korean,1
+jorge,varios_anios,mathcore,1
+jorge,varios_anios,melty blood,1
+jorge,varios_anios,metal,5
+jorge,varios_anios,metalcore,3
+jorge,varios_anios,new age,1
+jorge,varios_anios,new flamenco,1
+jorge,varios_anios,nu metal,6
+jorge,varios_anios,piano,1
+jorge,varios_anios,pop,4
+jorge,varios_anios,pop punk,1
+jorge,varios_anios,portuguese,1
+jorge,varios_anios,post-hardcore,1
+jorge,varios_anios,power metal,1
+jorge,varios_anios,progressive rock,1
+jorge,varios_anios,psychedelic,1
+jorge,varios_anios,psychedelic rock,1
+jorge,varios_anios,punk,1
+jorge,varios_anios,punk rock,2
+jorge,varios_anios,rap,3
+jorge,varios_anios,rapcore,1
+jorge,varios_anios,rnb,1
+jorge,varios_anios,rock,15
+jorge,varios_anios,screamo,2
+jorge,varios_anios,soprano,1
+jorge,varios_anios,soul,1
+jorge,varios_anios,soundtrack,11
+jorge,varios_anios,spanish rock,1
+jorge,varios_anios,techno,1
+jorge,varios_anios,trip-hop,1
+jorge,varios_anios,vaporwave,1
+jorge,varios_anios,video game music,7
+pablo,ultimas_4_semanas,alternative,1
+pablo,ultimas_4_semanas,alternative rock,1
+pablo,ultimas_4_semanas,art pop,1
+pablo,ultimas_4_semanas,blues,1
+pablo,ultimas_4_semanas,blues rock,1
+pablo,ultimas_4_semanas,clasica,1
+pablo,ultimas_4_semanas,classical,1
+pablo,ultimas_4_semanas,dark ambient,1
+pablo,ultimas_4_semanas,drone,1
+pablo,ultimas_4_semanas,electropop,1
+pablo,ultimas_4_semanas,experimental,1
+pablo,ultimas_4_semanas,flamenco,5
+pablo,ultimas_4_semanas,folk,3
+pablo,ultimas_4_semanas,free jazz,1
+pablo,ultimas_4_semanas,fusion,3
+pablo,ultimas_4_semanas,galiza,1
+pablo,ultimas_4_semanas,guitar,1
+pablo,ultimas_4_semanas,guitar virtuoso,1
+pablo,ultimas_4_semanas,hardcore,1
+pablo,ultimas_4_semanas,hip hop,12
+pablo,ultimas_4_semanas,hip-hop,10
+pablo,ultimas_4_semanas,hiphop,1
+pablo,ultimas_4_semanas,indie,2
+pablo,ultimas_4_semanas,indie pop,1
+pablo,ultimas_4_semanas,indie rock,1
+pablo,ultimas_4_semanas,latin,4
+pablo,ultimas_4_semanas,new flamenco,1
+pablo,ultimas_4_semanas,noise,2
+pablo,ultimas_4_semanas,north carolina,1
+pablo,ultimas_4_semanas,patchanka,1
+pablo,ultimas_4_semanas,pianist,1
+pablo,ultimas_4_semanas,piano,1
+pablo,ultimas_4_semanas,pop,3
+pablo,ultimas_4_semanas,pop punk,1
+pablo,ultimas_4_semanas,pop rock,1
+pablo,ultimas_4_semanas,puerto rico,3
+pablo,ultimas_4_semanas,punk,1
+pablo,ultimas_4_semanas,rap,17
+pablo,ultimas_4_semanas,rap combativo,1
+pablo,ultimas_4_semanas,rap politico,1
+pablo,ultimas_4_semanas,rap venezolano,1
+pablo,ultimas_4_semanas,reggaeton,4
+pablo,ultimas_4_semanas,rnb,1
+pablo,ultimas_4_semanas,rock,8
+pablo,ultimas_4_semanas,rock transgresivo,1
+pablo,ultimas_4_semanas,rock urbano,1
+pablo,ultimas_4_semanas,rumba,2
+pablo,ultimas_4_semanas,ska,2
+pablo,ultimas_4_semanas,ska punk,1
+pablo,ultimas_4_semanas,spain,10
+pablo,ultimas_4_semanas,spanish hip-hop,2
+pablo,ultimas_4_semanas,spanish rap,5
+pablo,ultimas_4_semanas,spanish rock,4
+pablo,ultimas_4_semanas,trap,2
+pablo,ultimas_4_semanas,underground,1
+pablo,ultimas_4_semanas,underground hip-hop,1
+pablo,ultimas_4_semanas,underground rap,1
+pablo,ultimos_6_meses,actor,1
+pablo,ultimos_6_meses,alternative,2
+pablo,ultimos_6_meses,alternative rock,2
+pablo,ultimos_6_meses,antifascist,1
+pablo,ultimos_6_meses,argentina,3
+pablo,ultimos_6_meses,art pop,1
+pablo,ultimos_6_meses,chamber folk,1
+pablo,ultimos_6_meses,dark ambient,1
+pablo,ultimos_6_meses,drone,1
+pablo,ultimos_6_meses,electronic,1
+pablo,ultimos_6_meses,electropop,1
+pablo,ultimos_6_meses,experimental,1
+pablo,ultimos_6_meses,flamenco,4
+pablo,ultimos_6_meses,folk,3
+pablo,ultimos_6_meses,free jazz,1
+pablo,ultimos_6_meses,fusion,2
+pablo,ultimos_6_meses,galiza,1
+pablo,ultimos_6_meses,gangsta rap,1
+pablo,ultimos_6_meses,guitar,1
+pablo,ultimos_6_meses,guitar virtuoso,1
+pablo,ultimos_6_meses,hardcore,1
+pablo,ultimos_6_meses,hip hop,14
+pablo,ultimos_6_meses,hip-hop,15
+pablo,ultimos_6_meses,hiphop,1
+pablo,ultimos_6_meses,indie,2
+pablo,ultimos_6_meses,indie pop,1
+pablo,ultimos_6_meses,latin,3
+pablo,ultimos_6_meses,mexico,1
+pablo,ultimos_6_meses,new flamenco,1
+pablo,ultimos_6_meses,noise,1
+pablo,ultimos_6_meses,north carolina,1
+pablo,ultimos_6_meses,oi,1
+pablo,ultimos_6_meses,patchanka,1
+pablo,ultimos_6_meses,please let me lick you,1
+pablo,ultimos_6_meses,pop,2
+pablo,ultimos_6_meses,puerto rico,2
+pablo,ultimos_6_meses,punk,3
+pablo,ultimos_6_meses,punk rock,2
+pablo,ultimos_6_meses,rap,21
+pablo,ultimos_6_meses,rap combativo,1
+pablo,ultimos_6_meses,rap politico,1
+pablo,ultimos_6_meses,rap venezolano,1
+pablo,ultimos_6_meses,reggaeton,3
+pablo,ultimos_6_meses,rnb,2
+pablo,ultimos_6_meses,rock,9
+pablo,ultimos_6_meses,rock transgresivo,1
+pablo,ultimos_6_meses,rock urbano,1
+pablo,ultimos_6_meses,rumba,1
+pablo,ultimos_6_meses,ska,2
+pablo,ultimos_6_meses,ska punk,1
+pablo,ultimos_6_meses,spain,7
+pablo,ultimos_6_meses,spanish hip-hop,2
+pablo,ultimos_6_meses,spanish rap,5
+pablo,ultimos_6_meses,spanish rock,4
+pablo,ultimos_6_meses,street punk,1
+pablo,ultimos_6_meses,trap,5
+pablo,ultimos_6_meses,underground,1
+pablo,ultimos_6_meses,underground hip-hop,2
+pablo,ultimos_6_meses,underground rap,1
+pablo,ultimos_6_meses,west coast,1
+pablo,varios_anios,alternative,2
+pablo,varios_anios,alternative rock,2
+pablo,varios_anios,ambient,1
+pablo,varios_anios,argentina,2
+pablo,varios_anios,art pop,1
+pablo,varios_anios,basque,1
+pablo,varios_anios,dark ambient,1
+pablo,varios_anios,drone,2
+pablo,varios_anios,electronic,2
+pablo,varios_anios,electropop,1
+pablo,varios_anios,experimental,1
+pablo,varios_anios,flamenco,4
+pablo,varios_anios,folk,2
+pablo,varios_anios,free jazz,1
+pablo,varios_anios,fusion,2
+pablo,varios_anios,galiza,1
+pablo,varios_anios,hardcore,4
+pablo,varios_anios,hip hop,12
+pablo,varios_anios,hip-hop,13
+pablo,varios_anios,hiphop,1
+pablo,varios_anios,indie,2
+pablo,varios_anios,indie pop,1
+pablo,varios_anios,latin,3
+pablo,varios_anios,new flamenco,1
+pablo,varios_anios,noise,1
+pablo,varios_anios,north carolina,1
+pablo,varios_anios,patchanka,1
+pablo,varios_anios,pop,5
+pablo,varios_anios,pop punk,1
+pablo,varios_anios,pop-rock,1
+pablo,varios_anios,puerto rico,2
+pablo,varios_anios,punk,5
+pablo,varios_anios,punk rock,3
+pablo,varios_anios,punkrock,1
+pablo,varios_anios,rap,20
+pablo,varios_anios,rap combativo,1
+pablo,varios_anios,rap politico,1
+pablo,varios_anios,rap venezolano,1
+pablo,varios_anios,rapcore,1
+pablo,varios_anios,reggaeton,3
+pablo,varios_anios,rnb,2
+pablo,varios_anios,rock,12
+pablo,varios_anios,rock en espanol,1
+pablo,varios_anios,rock transgresivo,1
+pablo,varios_anios,rock urbano,1
+pablo,varios_anios,rumba,1
+pablo,varios_anios,ska,3
+pablo,varios_anios,ska punk,1
+pablo,varios_anios,spain,7
+pablo,varios_anios,spanish hip-hop,2
+pablo,varios_anios,spanish rap,5
+pablo,varios_anios,spanish rock,3
+pablo,varios_anios,trap,4
+pablo,varios_anios,underground,1
+pablo,varios_anios,underground hip-hop,1
+pablo,varios_anios,underground rap,1

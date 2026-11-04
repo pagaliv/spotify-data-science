@@ -5,7 +5,7 @@ de la Rioja): recogida de los artistas más escuchados en Spotify, enriquecidos 
 géneros y similitud de Last.fm y con popularidad de Deezer, para analizar y comparar
 el gusto musical de dos usuarios.
 
-> **Versión actual: v0.4** — ver [Changelog](CHANGELOG.md).
+> **Versión actual: v0.5.0.5** — ver [Changelog](CHANGELOG.md).
 
 ## Stack
 
@@ -20,7 +20,8 @@ el gusto musical de dos usuarios.
 spotify-data-science/
 ├── TrabajoTecnicasDeCienciaDeDatos.ipynb   # extracción de artistas y géneros
 ├── AnalisisTecnicasDeCienciaDeDatos.ipynb  # análisis, métricas y figuras
-├── spotify_analisis.py                     # funciones puras reutilizables
+├── spotify_analisis.py                     # cálculo y acceso a fuentes
+├── tests/                                  # pruebas sin llamadas reales a APIs
 ├── top_artistas.csv                        # datos de Pablo (no versionado)
 ├── top_artistasJorge.csv                   # datos de Jorge (no versionado)
 ├── .env                                    # credenciales (no versionado)
@@ -88,11 +89,15 @@ Abre `TrabajoTecnicasDeCienciaDeDatos.ipynb`, ajusta `USUARIO` a `"pablo"` o
 `"jorge"` y ejecuta. El cuaderno:
 
 - autentica contra Spotify (OAuth en el navegador, scope `user-top-read`);
-- descarga el top 50 en `short_term`, `medium_term` y `long_term`;
+- solicita hasta 50 artistas en `short_term`, `medium_term` y `long_term`;
 - consulta Last.fm una vez por artista único para obtener hasta 4 géneros;
 - exporta `top_artistas.csv` o `top_artistasJorge.csv`.
 
-Ambos CSV deben generarse el mismo día para limitar la deriva temporal.
+Es recomendable generar ambos CSV el mismo día para limitar la deriva temporal.
+Los archivos recibidos tienen 150 filas de Pablo y 148 de Jorge (48/50/50); no se
+inventan las dos posiciones restantes. La unión reúne 140 artistas, 5 compartidos.
+Solo está acreditada la fecha original de Pablo (2026-11-03); la de Jorge se
+mantiene desconocida en los metadatos.
 
 ### 2. Análisis
 
@@ -104,8 +109,30 @@ artistas por género y genera:
 - las diez figuras de `doc/img/`;
 - las tablas agregadas y `metricas.json` en `resultados/`.
 
-La caché de enriquecimiento (`cache/`) evita repetir llamadas a las APIs entre
-ejecuciones.
+La caché de enriquecimiento (`cache/`) evita repetir consultas válidas a las APIs.
+Los fallos persistentes detienen la ejecución sin registrarse como ausencias; los
+artistas no encontrados y las listas vacías válidas sí se cachean. Deezer requiere
+coincidencia exacta de nombre, ignorando mayúsculas y espacios exteriores.
+Los candidatos necesitan sus propios vecinos de Last.fm antes de calcular afinidad.
+
+Los artistas sin etiquetas participan en Jaccard, pero no en los perfiles de etiquetas.
+Las proporciones de etiquetas no son proporciones de tiempo de escucha. La afinidad
+es descriptiva, no una probabilidad ni una evaluación predictiva independiente.
+El agrupamiento y la PCA son exploratorios; las correlaciones no usan imputaciones.
+
+Si se guarda una copia ejecutada del cuaderno, debe quedar bajo `cache/`, no en el
+cuaderno versionado. Los datos originales y las respuestas externas son necesarios
+para reproducir los números: el repositorio no distribuye los perfiles personales.
+
+### 3. Pruebas
+
+```bash
+./venv/bin/python -m unittest discover -s tests -v
+```
+
+Las pruebas usan datos sintéticos y respuestas HTTP simuladas; no necesitan claves
+ni acceso a la red. Comprueban métricas, caché, errores, identificación de artistas,
+imputación y exportación JSON estricta (`null` para resultados no calculables).
 
 ## Privacidad y datos personales
 
@@ -116,11 +143,28 @@ del informe. Las credenciales nunca se escriben en los registros ni en el códig
 
 ## Informe
 
-El informe está en [`doc/main.pdf`](doc/main.pdf) (fuente LaTeX en [`doc/`](doc/)).
-Los capítulos 1-4 (planteamiento, datos, tratamiento y modelo) están revisados con
-el diseño final; los capítulos 5-6 (resultados y conclusiones) se completan con la
-ejecución del cuaderno de análisis. Ver [VERSIONS.md](VERSIONS.md) y
-[CHANGELOG.md](CHANGELOG.md) para el detalle de lo publicado.
+El informe completo está en [`doc/main.pdf`](doc/main.pdf) (fuente LaTeX en
+[`doc/`](doc/)): planteamiento, datos, tratamiento, modelo, resultados y conclusiones.
+Se fundamentan el ciclo de vida, las fuentes y los formatos en las sesiones 1–3 del
+material docente aportado, y las decisiones visuales en la sesión 6. Las métricas de
+similitud, afinidad y agrupamiento se distinguen como elecciones del proyecto.
+
+### Resultados principales (análisis del 2026-11-04)
+
+- 298 registros, 140 artistas distintos y 5 compartidos: Jaccard global **0,0357**.
+- Coseno global de etiquetas **0,4686**; no es una probabilidad de compatibilidad.
+- Last.fm aporta popularidad y vecinos para los 140 artistas; faltan 20 MBID.
+  Deezer tiene coincidencia exacta para 136 (4 ausencias, 2,86 %).
+- Los 20 candidatos son puntuables, pero ninguno tiene afinidad positiva para
+  ambos perfiles. Ordenar por su media no produce una recomendación de consenso.
+- K-Means conserva 133 artistas y 52 etiquetas, selecciona 2 grupos con silueta
+  **0,1508**; la PCA explica **26,42 %** de la varianza. Es exploratorio.
+
+Las cifras completas están en [`resultados/metricas.json`](resultados/metricas.json).
+La repetición completa con HTTP bloqueado produjo métricas, tablas y figuras
+idénticas, sin modificar los CSV originales. El ajuste temporal a IPv4 utilizado
+en esta máquina para evitar conexiones IPv6 bloqueadas no modifica el cuaderno
+fuente ni los datos. Ver [VERSIONS.md](VERSIONS.md) y [CHANGELOG.md](CHANGELOG.md).
 
 Para recompilar:
 

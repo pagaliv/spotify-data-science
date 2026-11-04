@@ -1,0 +1,7 @@
+usuario,rango,rho,p_valor,n
+jorge,ultimas_4_semanas,0.1845,0.20924,48
+jorge,ultimos_6_meses,-0.0033,0.981781,50
+jorge,varios_anios,-0.0337,0.816485,50
+pablo,ultimas_4_semanas,-0.1055,0.465907,50
+pablo,ultimos_6_meses,0.2548,0.074097,50
+pablo,varios_anios,0.3275,0.020237,50

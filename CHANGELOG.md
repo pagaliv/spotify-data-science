@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5 - Análisis de los dos perfiles e informe final
+Se analizan los dos CSV recibidos sin regenerarlos ni completar posiciones ficticias: 298 filas, 140 artistas únicos y 5 compartidos. Se corrigen métricas, integración de APIs y afinidad; se generan resultados agregados y diez figuras, y se completan los seis capítulos del informe con fundamento explícito en el material docente. Se mantiene desconocida la fecha original de Jorge y se separa de la fecha de análisis (2026-11-04).
+
+### Detalle por subversión:
+- `v0.5.0.1:fix(analisis)`: Jaccard y estabilidad incluyen artistas sin etiquetas; se consultan vecinos de candidatos; los fallos persistentes no se cachean como ausencias y se preservan respuestas válidas previas; Deezer exige coincidencia de nombre; el JSON representa no calculables como `null`. Se añaden 16 pruebas con HTTP simulado.
+- `v0.5.0.2:mod(analisis)`: visualizaciones con escalas comparables, colores consistentes, anotaciones y selección de k sin doble eje; candidatos anónimos y cobertura explícita; cuaderno fuente sin salidas personales.
+- `v0.5.0.3:data(resultados)`: ejecución real con Last.fm y Deezer, tablas agregadas, metadatos y diez PNG. Jaccard global 0,0357, coseno 0,4686, 20/20 candidatos puntuables sin coincidencia positiva bilateral y agrupamiento de 133 artistas en dos grupos (silueta 0,1508). Repetición completa con HTTP bloqueado: cero consultas, salidas idénticas y CSV originales intactos. La caché y las copias ejecutadas permanecen locales e ignoradas.
+- `v0.5.0.4:doc(doc)`: capítulos 1–6 alineados con resultados reales, referencias a las sesiones 1–3 y 6, fórmulas y limitaciones corregidas, capítulos numerados y PDF recompilado. Se distinguen análisis exploratorio, imputación demostrativa y validación predictiva no realizada.
+- `v0.5.0.5:doc(README)`: estado final, cifras principales, pruebas, privacidad y procedimiento de ejecución actualizados. No se regeneran extracciones de Spotify ni se publican datos personales.
+
 ## v0.4 - Entorno reproducible, módulo de análisis y datos regenerados
 Se consolida el proyecto como un entorno reproducible (venv, `requirements.txt`, `.env.example`, `.gitignore`) y se separa la lógica de análisis en un módulo propio. El cuaderno de extracción se parametriza por autor y se regeneran los datos con las credenciales actuales. Se añade el cuaderno de análisis, que consolida ambos CSV, enriquece con Last.fm (`getInfo`, `getSimilar`) y Deezer, cuantifica y trata nulos, y calcula compatibilidad, popularidad, afinidad y agrupamiento. Se actualizan los capítulos 1-4 del informe con el diseño final.
 

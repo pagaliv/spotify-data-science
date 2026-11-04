@@ -1,0 +1,7 @@
+usuario,rango,n_artistas,n_con_genero,pct_con_genero,n_generos,genero_top
+jorge,ultimas_4_semanas,48,48,100.0,64,rock
+jorge,ultimos_6_meses,50,49,98.0,64,rock
+jorge,varios_anios,50,49,98.0,66,rock
+pablo,ultimas_4_semanas,50,47,94.0,57,rap
+pablo,ultimos_6_meses,50,49,98.0,60,rap
+pablo,varios_anios,50,50,100.0,56,rap

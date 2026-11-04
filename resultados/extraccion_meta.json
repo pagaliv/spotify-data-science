@@ -8,7 +8,19 @@
       "varios_anios"
     ],
     "artistas_unicos": 74,
-    "filas_con_generos": 146
+    "filas_con_generos": 146,
+    "fecha_validacion": "2026-11-04"
   },
-  "jorge": null
+  "jorge": {
+    "fecha": null,
+    "fecha_validacion": "2026-11-04",
+    "filas": 148,
+    "artistas_unicos": 71,
+    "rangos": [
+      "ultimas_4_semanas",
+      "ultimos_6_meses",
+      "varios_anios"
+    ],
+    "filas_con_generos": 146
+  }
 }

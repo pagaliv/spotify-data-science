@@ -1,8 +1,4 @@
-"""Funciones de análisis del proyecto Spotify.
-
-Módulo sin estado: carga los CSV extraídos con Spotify/Last.fm, consolida el
-modelo de datos, enriquece artistas y calcula los análisis del informe.
-"""
+"""Carga, enriquecimiento y análisis de los rankings de artistas de Spotify."""
 
 from __future__ import annotations
 
@@ -210,22 +206,21 @@ def similitud_coseno(a: pd.Series, b: pd.Series) -> float:
 
 
 def _vectores_usuario_rango(
-    df_generos: pd.DataFrame, usuario: str, rango: str
+    df: pd.DataFrame, df_generos: pd.DataFrame, usuario: str, rango: str
 ) -> tuple[set, pd.Series]:
-    filtrado = df_generos[
-        (df_generos["usuario"] == usuario) & (df_generos["rango"] == rango)
-    ]
-    artistas = set(filtrado["artista"])
-    vector = perfil_generos(filtrado)
+    artistas = set(df.loc[(df["usuario"] == usuario) & (df["rango"] == rango), "artista"])
+    vector = perfil_generos(df_generos, usuario=usuario, rango=rango)
     return artistas, vector
 
 
-def estabilidad_por_rangos(df_generos: pd.DataFrame, usuario: str) -> pd.DataFrame:
+def estabilidad_por_rangos(
+    df: pd.DataFrame, df_generos: pd.DataFrame, usuario: str
+) -> pd.DataFrame:
     """Jaccard de artistas y coseno de géneros entre cada par de rangos."""
     filas = []
     for rango_a, rango_b in combinations(ORDEN_RANGOS, 2):
-        artistas_a, vector_a = _vectores_usuario_rango(df_generos, usuario, rango_a)
-        artistas_b, vector_b = _vectores_usuario_rango(df_generos, usuario, rango_b)
+        artistas_a, vector_a = _vectores_usuario_rango(df, df_generos, usuario, rango_a)
+        artistas_b, vector_b = _vectores_usuario_rango(df, df_generos, usuario, rango_b)
         filas.append(
             {
                 "usuario": usuario,
@@ -239,17 +234,19 @@ def estabilidad_por_rangos(df_generos: pd.DataFrame, usuario: str) -> pd.DataFra
     return pd.DataFrame(filas)
 
 
-def tabla_compatibilidad(df_generos: pd.DataFrame) -> pd.DataFrame:
+def tabla_compatibilidad(df: pd.DataFrame, df_generos: pd.DataFrame) -> pd.DataFrame:
     """Compatibilidad entre los dos usuarios por rango y global."""
     filas = []
     for rango in list(ORDEN_RANGOS) + ["global"]:
         conjuntos, vectores = {}, {}
-        for usuario in sorted(df_generos["usuario"].unique()):
-            filtrado = df_generos[df_generos["usuario"] == usuario]
+        for usuario in sorted(df["usuario"].unique()):
+            filtrado = df[df["usuario"] == usuario]
             if rango != "global":
                 filtrado = filtrado[filtrado["rango"] == rango]
             conjuntos[usuario] = set(filtrado["artista"])
-            vectores[usuario] = perfil_generos(filtrado)
+            vectores[usuario] = perfil_generos(
+                df_generos, usuario=usuario, rango=None if rango == "global" else rango
+            )
         usuarios = sorted(conjuntos)
         if len(usuarios) != 2:
             continue
@@ -283,13 +280,21 @@ def _peticion_json(url: str, params: dict, intentos: int = 3) -> dict:
             if respuesta.status_code == 429 or respuesta.status_code >= 500:
                 raise requests.HTTPError(f"HTTP {respuesta.status_code}")
             respuesta.raise_for_status()
-            return respuesta.json()
+            datos = respuesta.json()
+            if not isinstance(datos, dict):
+                raise ValueError("Respuesta JSON inesperada")
+            error = datos.get("error")
+            if error in (11, 16, 29):
+                raise requests.RequestException("Error temporal de la API")
+            if error and error != 6:
+                raise RuntimeError("La API rechazó la consulta; revisa su disponibilidad y las credenciales.")
+            return datos
         except (requests.RequestException, ValueError):
             if intento == intentos - 1:
-                return {}
+                raise RuntimeError("La fuente externa no respondió correctamente tras los reintentos.") from None
             time.sleep(espera)
             espera *= 2
-    return {}
+    raise RuntimeError("No se ha realizado ninguna consulta.")
 
 
 def _lastfm_key() -> str:
@@ -351,8 +356,10 @@ def deezer_artista(artista: str) -> dict:
     objetivo = artista.casefold().strip()
     elegido = next(
         (r for r in resultados if str(r.get("name", "")).casefold().strip() == objetivo),
-        resultados[0],
+        None,
     )
+    if elegido is None:
+        return {"deezer_fans": None, "deezer_nb_album": None, "deezer_url": None}
     return {
         "deezer_fans": elegido.get("nb_fan"),
         "deezer_nb_album": elegido.get("nb_album"),
@@ -387,28 +394,30 @@ def enriquecer_artistas(
     entradas = cache["entries"]
     pendientes = 0
 
-    for artista in sorted({a for a in artistas if a}):
-        clave_info = f"getinfo::{artista}"
-        clave_simil = f"getsimilar::{artista}"
-        clave_deezer = f"deezer::{artista}"
+    try:
+        for artista in sorted({a for a in artistas if a}):
+            clave_info = f"getinfo::{artista}"
+            clave_simil = f"getsimilar::{artista}"
+            clave_deezer = f"deezer::{artista}"
 
-        if clave_info not in entradas:
-            entradas[clave_info] = info_artista(artista)
-            time.sleep(pausa_lastfm)
-            pendientes += 1
-        if clave_simil not in entradas:
-            entradas[clave_simil] = similares_artista(artista)
-            time.sleep(pausa_lastfm)
-            pendientes += 1
-        if clave_deezer not in entradas:
-            entradas[clave_deezer] = deezer_artista(artista)
-            time.sleep(pausa_deezer)
-            pendientes += 1
+            if clave_info not in entradas:
+                entradas[clave_info] = info_artista(artista)
+                time.sleep(pausa_lastfm)
+                pendientes += 1
+            if clave_simil not in entradas:
+                entradas[clave_simil] = similares_artista(artista)
+                time.sleep(pausa_lastfm)
+                pendientes += 1
+            if clave_deezer not in entradas:
+                entradas[clave_deezer] = deezer_artista(artista)
+                time.sleep(pausa_deezer)
+                pendientes += 1
 
-        if pendientes and pendientes % guardar_cada == 0:
-            _guardar_cache(cache, ruta_cache)
-
-    _guardar_cache(cache, ruta_cache)
+            if pendientes >= guardar_cada:
+                _guardar_cache(cache, ruta_cache)
+                pendientes = 0
+    finally:
+        _guardar_cache(cache, ruta_cache)
 
     filas, similitudes = [], []
     for artista in sorted({a for a in artistas if a}):
@@ -434,7 +443,26 @@ def enriquecer_artistas(
             similitudes.append(
                 {"artista": artista, "similar": s["similar"], "match": s["match"]}
             )
-    return pd.DataFrame(filas), pd.DataFrame(similitudes)
+    return pd.DataFrame(filas), pd.DataFrame(similitudes, columns=["artista", "similar", "match"])
+
+
+def enriquecer_similitudes(
+    artistas: list[str],
+    ruta_cache: str | Path = "cache/enriquecimiento.json",
+    pausa: float = 0.25,
+) -> pd.DataFrame:
+    """Consulta los vecinos de candidatos sin expandir de nuevo la red."""
+    cache = _cargar_cache(ruta_cache)
+    filas = []
+    for artista in sorted(set(artistas)):
+        clave = f"getsimilar::{artista}"
+        if clave not in cache["entries"]:
+            cache["entries"][clave] = similares_artista(artista)
+            _guardar_cache(cache, ruta_cache)
+            time.sleep(pausa)
+        for vecino in cache["entries"][clave]:
+            filas.append({"artista": artista, **vecino})
+    return pd.DataFrame(filas, columns=["artista", "similar", "match"])
 
 
 def unir_enriquecimiento(df: pd.DataFrame, df_artistas: pd.DataFrame) -> pd.DataFrame:
@@ -468,7 +496,7 @@ def resumen_nulos(df_artistas: pd.DataFrame) -> pd.DataFrame:
         if columna == "generos":
             nulos = int(df_artistas[columna].fillna("").astype(str).str.strip().eq("").sum())
         elif columna == "n_similares":
-            nulos = int(df_artistas[columna].isna().sum())
+            nulos = int(df_artistas[columna].fillna(0).eq(0).sum())
         else:
             nulos = int(df_artistas[columna].isna().sum())
         filas.append(
@@ -763,6 +791,25 @@ def proyectar_pca(X: np.ndarray) -> tuple[np.ndarray, float]:
 # ---------------------------------------------------------------------------
 # Salida de figuras
 # ---------------------------------------------------------------------------
+
+
+def exportar_metricas(metricas: dict, ruta: str | Path) -> None:
+    """Exporta JSON estricto conservando las métricas no calculables como null."""
+    def limpiar(valor):
+        if isinstance(valor, dict):
+            return {k: limpiar(v) for k, v in valor.items()}
+        if isinstance(valor, (list, tuple)):
+            return [limpiar(v) for v in valor]
+        if isinstance(valor, np.generic):
+            valor = valor.item()
+        if isinstance(valor, float) and not math.isfinite(valor):
+            return None
+        return valor
+
+    Path(ruta).write_text(
+        json.dumps(limpiar(metricas), ensure_ascii=False, indent=2, allow_nan=False) + "\n",
+        encoding="utf-8",
+    )
 
 
 def guardar_figura(fig, nombre: str, carpeta: str | Path = "doc/img") -> Path:

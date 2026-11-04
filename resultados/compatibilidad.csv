@@ -1,0 +1,5 @@
+rango,jaccard_artistas,coseno_generos,n_comun_artistas,n_comun_generos
+ultimas_4_semanas,0.0316,0.3247,3,20
+ultimos_6_meses,0.0417,0.311,4,17
+varios_anios,0.0309,0.4112,3,19
+global,0.0357,0.4686,5,27

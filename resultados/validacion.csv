@@ -1,0 +1,7 @@
+usuario,rango,filas,artistas_unicos,duplicados_rango_posicion,posiciones_fuera_de_rango,sin_genero
+jorge,ultimas_4_semanas,48,48,0,0,0
+jorge,ultimos_6_meses,50,50,0,0,1
+jorge,varios_anios,50,50,0,0,1
+pablo,ultimas_4_semanas,50,50,0,0,3
+pablo,ultimos_6_meses,50,50,0,0,1
+pablo,varios_anios,50,50,0,0,0
